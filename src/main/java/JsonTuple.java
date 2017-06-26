@@ -1,5 +1,6 @@
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.annotations.SerializedName;
 import org.apache.jena.atlas.json.JSON;
 
 import java.io.*;
@@ -10,6 +11,7 @@ import java.util.ArrayList;
  */
 public class JsonTuple {
     String uri;
+    @SerializedName("jbo:mentions")
     ArrayList<String> mentions;
 
     public JsonTuple(){

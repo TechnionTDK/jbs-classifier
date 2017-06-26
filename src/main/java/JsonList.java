@@ -29,7 +29,6 @@ public class JsonList {
             Gson gson=new GsonBuilder().setPrettyPrinting().create();
             String tupleJson = gson.toJson(list);
             gson.toJson(tupleJson);
-            System.out.println(tupleJson);
             writer.write(tupleJson);
             writer.close();
         }

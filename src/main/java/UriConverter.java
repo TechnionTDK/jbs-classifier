@@ -92,7 +92,7 @@ public class UriConverter {
 
     public static void main(String[] args){
 
-      UriConverter u=new UriConverter("מלכים א,א,י\"ב-כ");
+      UriConverter u=new UriConverter("ברכות,פא,ב");
 
         System.out.println( u.getUris());
 
