@@ -71,8 +71,6 @@ public class UriConverter {
     public ArrayList<String> getUris() {
         for (String pasuk : this.psukim) {
             String source=""  +" \""+this.sefer+" "+this.perek+" "+pasuk+"\"";
-
-
             ResultSet results = new Queries().findUris(source);
            String uri= ResultSetFormatter.toList(results).get(0).toString();
            uri=uri.split("resource/")[1];
@@ -92,9 +90,11 @@ public class UriConverter {
 
     public static void main(String[] args){
 
-      UriConverter u=new UriConverter("ברכות,פא,ב");
 
-        System.out.println( u.getUris());
+
+          UriConverter u=new UriConverter("מסכת בבא קמא,ב,א");
+
+       System.out.println( u.getUris());
 
 
     }

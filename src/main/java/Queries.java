@@ -14,7 +14,7 @@ public class Queries {
                 ("PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>"
                         + "PREFIX jbr: <http://jbs.technion.ac.il/resource/>"
                         + "PREFIX jbo: <http://jbs.technion.ac.il/ontology/>"
-                        + "SELECT ?uri from <http://jbs.technion.ac.il> where {?uri a jbo:Pasuk. ?uri rdfs:label"
+                        + "SELECT ?uri from <http://jbs.technion.ac.il> where { ?uri rdfs:label"
                         + source + ".}");
 
         Query q = queryStr.asQuery();
@@ -47,7 +47,7 @@ public class Queries {
         ArrayList<String> urls = new ArrayList<String>();
         for(int i=0; i<34; i++) {
             queryStr.setCommandText("PREFIX foaf: <http://xmlns.com/foaf/0.1/>\n" +
-                    "SELECT ?s FROM <http://he.dbpedia.org> WHERE {?s a foaf:Document}ORDER BY (?s) LIMIT 10000 OFFSET " + offset);
+                    "SELECT ?s FROM <http://he.dbpedia.org> WHERE {?s a foaf:Document} LIMIT 10000 OFFSET " + offset);
             Query q;
             q = queryStr.asQuery();
             QueryExecution qExe = QueryExecutionFactory.sparqlService("http://tdk3.csf.technion.ac.il:8890/sparql", q);
@@ -58,7 +58,6 @@ public class Queries {
             }
             offset+=10000;
         }
-        System.out.println(urls.size());
         return urls;
     }
 
