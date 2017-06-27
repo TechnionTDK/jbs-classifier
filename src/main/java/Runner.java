@@ -2,39 +2,39 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
 import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 
 /**
  * Created by netanel on 26/06/2017.
  */
-public class Runner {
-    JsonList list;
+public class Runner implements Runnable{
+    static JsonList list = new JsonList();
+    String url;
 
-    public Runner(){
-        this.list=new JsonList();
+    public Runner(String URL){
+        url = URL;
     }
 
     public void run(){
-        for(String url:new Queries().getAllWikipediaPages()){
-            ArrayList<String> sources=new ArrayList<String>();//=call Topic with url ang get all sources strings
+        try {
+            WikiPageParser newWiki = new WikiPageParser(url);
+            newWiki.WikiPageMain();
+
             JsonTuple jt=new JsonTuple();
             jt.setUri(url);
-            for(String source:sources){
-                ArrayList<String> uris=new UriConverter(source).getUris();
+            for(Source source : newWiki.tanachRefs.sourceList){
+                ArrayList<String> uris=new UriConverter(source.fullRef).getUris();
+                jt.setMentions(uris);
+            }
+            for(Source source : newWiki.gmaraRefs.sourceList){
+                ArrayList<String> uris=new UriConverter(source.fullRef).getUris();
                 jt.setMentions(uris);
             }
             this.list.addJsonTuple(jt);
-
+        } catch (IOException e) {
+            e.printStackTrace();
         }
-        FileWriter writer;
-        try {writer = new FileWriter("Output.json") ;
-            Gson gson=new GsonBuilder().setPrettyPrinting().create();
-            String tupleJson = gson.toJson(this.list);
-            gson.toJson(tupleJson);
-            writer.write(tupleJson);
-            writer.close();
-        }
-        catch(Exception e){}
-
     }
+
 }

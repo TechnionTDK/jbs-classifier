@@ -72,7 +72,7 @@ abstract public class WikiBookRefs {
  */   }
 
     void addTitleSources(Document jsoupDoc){
-        Element prevElement = (jsoupDoc.text("dummy")) ;
+        Element prevElement = new Element("avneravneravner");
         for( Element titleElement : jsoupDoc.select("[title~=s:"+ getRefRegx())){
             if (titleElement.parent()==prevElement.parent())
                 continue;

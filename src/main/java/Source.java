@@ -4,7 +4,7 @@ import java.util.ArrayList;
  * Created by eurocom on 12/05/2017.
  */
 public class Source {
-    String source;
+    String fullRef;
     String book;
     String perek;
     String from;
@@ -16,7 +16,7 @@ public class Source {
     Source(String reference, String mainbook){
         if (mainbook!=null && reference.startsWith(mainbook))
             matchBook = true;
-        source = reference;
+        fullRef = reference;
 
         String[] refSplit = reference.split(",");
         book = refSplit[0];
@@ -28,7 +28,7 @@ public class Source {
 
 
     Boolean validate() {
-        UriConverter u = new UriConverter(source);
+        UriConverter u = new UriConverter(fullRef);
         ArrayList<String> uris = u.getUris();
         if (uris.isEmpty())
             return false;
