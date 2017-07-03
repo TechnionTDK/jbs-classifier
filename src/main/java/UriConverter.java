@@ -21,7 +21,9 @@ public class UriConverter {
     public UriConverter(String source) {
         this.psukim = new ArrayList();
         this.uris = new ArrayList();
-        this.source = source.replace("\"", "");
+        this.source = source.replace(", ", ",");
+        this.source = this.source.replace(" ,", ",");
+        this.source = this.source.replace("\"", "");
 
 
 
@@ -72,13 +74,15 @@ public class UriConverter {
         for (String pasuk : this.psukim) {
             String source=""  +" \""+this.sefer+" "+this.perek+" "+pasuk+"\"";
             ResultSet results = new Queries().findUris(source);
-           String uri= ResultSetFormatter.toList(results).get(0).toString();
+            System.out.println(source);
+           try{String uri= ResultSetFormatter.toList(results).get(0).toString();
            uri=uri.split("resource/")[1];
             uri=uri.split(">")[0];
             uri="jbr:"+uri;
 
 
-           this.uris.add(uri);
+           this.uris.add(uri);}
+           catch (Exception e){}
         }
         return this.uris;
 

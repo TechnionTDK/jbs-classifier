@@ -24,10 +24,13 @@ public class Runner implements Runnable{
             JsonTuple jt=new JsonTuple();
             jt.setUri(url);
             for(Source source : newWiki.tanachRefs.sourceList){
+                System.out.println(source);
                 ArrayList<String> uris=new UriConverter(source.fullRef).getUris();
                 jt.setMentions(uris);
             }
             for(Source source : newWiki.gmaraRefs.sourceList){
+                source.fullRef="מסכת "+source.fullRef;
+                System.out.println(source);
                 ArrayList<String> uris=new UriConverter(source.fullRef).getUris();
                 jt.setMentions(uris);
             }
