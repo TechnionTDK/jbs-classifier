@@ -34,7 +34,8 @@ public class Runner implements Runnable{
                 ArrayList<String> uris=new UriConverter(source.fullRef).getUris();
                 jt.setMentions(uris);
             }
-            this.list.addJsonTuple(jt);
+            if(!jt.mentions.isEmpty()){
+            this.list.addJsonTuple(jt);}
         } catch (IOException e) {
             e.printStackTrace();
         }
