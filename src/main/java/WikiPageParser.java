@@ -5,6 +5,7 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import java.io.IOException;
+import java.net.URI;
 import java.net.URLDecoder;
 import java.util.LinkedList;
 import java.util.List;
@@ -33,7 +34,8 @@ public class WikiPageParser {
 
     WikiPageParser(String wikiPageURL) throws IOException {
         url=wikiPageURL;
-        org.jsoup.Connection conn = Jsoup.connect(URLDecoder.decode(url));
+        url=URI.create(url).toASCIIString();
+        org.jsoup.Connection conn = Jsoup.connect(url);
         jsoupDoc = conn.get();
     }
 

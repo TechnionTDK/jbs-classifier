@@ -29,6 +29,7 @@ public class UriConverter {
 
         String[] data = this.source.split(",");
         this.sefer = data[0];
+        this.sefer=this.sefer.replaceAll("תהלים","תהילים");
         this.perek = data[1];
         if (data.length == 3) {
             if (data[2].contains("-")) {
@@ -74,7 +75,6 @@ public class UriConverter {
         for (String pasuk : this.psukim) {
             String source=""  +" \""+this.sefer+" "+this.perek+" "+pasuk+"\"";
             ResultSet results = new Queries().findUris(source);
-            System.out.println(source);
            try{String uri= ResultSetFormatter.toList(results).get(0).toString();
            uri=uri.split("resource/")[1];
             uri=uri.split(">")[0];
@@ -82,7 +82,9 @@ public class UriConverter {
 
 
            this.uris.add(uri);}
-           catch (Exception e){}
+           catch (Exception e){
+               System.out.println("failed converting: "+source);
+           }
         }
         return this.uris;
 

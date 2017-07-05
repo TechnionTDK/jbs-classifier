@@ -45,19 +45,22 @@ public class Queries {
         int offset=0;
         ParameterizedSparqlString queryStr = new ParameterizedSparqlString();
         ArrayList<String> urls = new ArrayList<String>();
-        for(int i=0; i<34; i++) {
+        for(int i=0; i<70; i++) {
             queryStr.setCommandText("PREFIX foaf: <http://xmlns.com/foaf/0.1/>\n" +
-                    "SELECT ?s FROM <http://he.dbpedia.org> WHERE {?s a foaf:Document} LIMIT 10000 OFFSET " + offset);
+                    "PREFIX dbo: <http://dbpedia.org/ontology/>\n" +
+                    "SELECT ?s FROM <http://he.dbpedia.org> WHERE {?s a foaf:Document. }  LIMIT 5000 OFFSET " + offset);
             Query q;
             q = queryStr.asQuery();
             QueryExecution qExe = QueryExecutionFactory.sparqlService("http://tdk3.csf.technion.ac.il:8890/sparql", q);
             ResultSet rs = qExe.execSelect();
             List<QuerySolution> solutions = ResultSetFormatter.toList(rs);
             for (QuerySolution sol : solutions) {
+                System.out.println(sol.toString().split("<")[1].split(">")[0]);
                 urls.add(sol.toString().split("<")[1].split(">")[0]);
             }
-            offset+=10000;
+            offset+=5000;
         }
+        System.out.println(urls.size());
         return urls;
     }
 
@@ -66,7 +69,14 @@ public class Queries {
 
 
        new Queries().getAllWikipediaPages();
-
-
+        ParameterizedSparqlString queryStr1=new ParameterizedSparqlString(" SELECT ?id"
+    +"    WHERE {"+
+    " ?uri <http://dbpedia.org/ontology/wikiPageID> ?id."
+          +"  FILTER (?uri = <http://dbpedia.org/resource/Weight_gain>)         }");
+        Query q;
+        q = queryStr1.asQuery();
+        QueryExecution qExe = QueryExecutionFactory.sparqlService("http://dbpedia.org/sparql", q);
+        ResultSet rs = qExe.execSelect();
+        ResultSetFormatter.out(rs);
     }
 }
