@@ -1,10 +1,12 @@
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
+import org.jsoup.parser.Tag;
 
-import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.regex.Matcher;
+
+import static com.sun.org.apache.xalan.internal.xsltc.compiler.util.Type.String;
 
 /**
  * Created by eurocom on 18/06/2017.
@@ -14,7 +16,6 @@ abstract public class WikiBookRefs {
     List<Source> sourceList=new LinkedList<Source>();
     static String location = "([א-ת&&[^ץ,^ף,^ן,^ך,^ם]][\\\"]?){1,3}[\\']?";
     static List<String> badWords = Arrays.asList("\\\'", "\\\"", "\\.", ";", "\\)", "\\(");
-
 
     WikiBookRefs(String book){
         mainBook = book;
@@ -78,7 +79,8 @@ abstract public class WikiBookRefs {
  */   }
 
     void addTitleSources(Document jsoupDoc){
-        Element prevElement = new Element("avneravneravner");
+        Element prevElement = new Element(Tag.valueOf("avneravneravner"), "");
+      //  Element prevElement = new Element("avneravneravner");
         for( Element titleElement : jsoupDoc.select("[title~=s:"+ getRefRegx())){
             if (titleElement.parent()==prevElement.parent())
                 continue;

@@ -24,6 +24,7 @@ public class Source {
         String[] pasukSplit = refSplit[2].split("-");
         from = pasukSplit[0];
         to = (pasukSplit.length > 1) ? pasukSplit[1] : pasukSplit[0];
+
     }
 
 
