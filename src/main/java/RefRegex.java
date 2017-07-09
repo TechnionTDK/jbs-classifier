@@ -8,12 +8,12 @@ import java.util.List;
 public class RefRegex {
 
 
-    static List<String> delim = Arrays.asList(",");
-    static List<String> suffix = Arrays.asList("$", "\\.", " ", "\\)");
+    static List<String> delim = Arrays.asList(",(( )?)", " ");
+    static List<String> suffix = Arrays.asList("$", ";", ",", "\\.", " ", "\\)");
 
 
     static String locationRange(String location){
-        return "(" + "-" + location + ")?";
+        return "(" + "(( )?)-(( )?)" + location + ")?";
     }
 
     static String regexFromList(List<String> listString, String delim, String pref, String suf, String globPref, String globSuf){
@@ -49,11 +49,11 @@ public class RefRegex {
 
     static String refRegexInit(String books, List<String> booksBand, List<String> pref1, String loc1, List<String> pref2, String loc2){
         String buildRefRegex = books + "[\\']?";
-        buildRefRegex += optionalNoSpaceList(delim) + " ";
+        buildRefRegex += orList(delim);
         if (booksBand!=null) buildRefRegex += bandList(booksBand);
         buildRefRegex += optionalList(pref1);
         buildRefRegex += loc1;
-        buildRefRegex += optionalNoSpaceList(delim) + " ";
+        buildRefRegex += orList(delim);
         buildRefRegex += optionalList(pref2);
         buildRefRegex += loc2;
         buildRefRegex += locationRange(loc2);

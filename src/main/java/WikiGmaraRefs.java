@@ -5,11 +5,11 @@ import java.util.List;
 
 public class WikiGmaraRefs extends WikiBookRefs {
 
-    protected static List<String> badWords = Arrays.asList("דפים","עמודים","עמוד","דף", "\\\'", "\\\"", "\\.", "\\)", "\\(");
+    protected static List<String> badWords = Arrays.asList("דפים","עמודים","עמוד","דף");
 
-    static List<String> sheetPrefix = Arrays.asList("עמוד");
+    static List<String> sheetPrefix = Arrays.asList("עמוד", "עמודים");
     static List<String> pagePrefix = Arrays.asList("דפים", "דף");
-    static String pageRegx = "([א,ב])[\\']?";
+    static String sheetRegx = "(ע[\\\"])?" + "([א,ב])[\\']?";
     static List<String> booksBand = Arrays.asList("");
 
     static List<String> gmaraBooksList = Arrays.asList(
@@ -53,7 +53,7 @@ public class WikiGmaraRefs extends WikiBookRefs {
     );
 
     protected static String gmaraBooks = RefRegex.booksInit(gmaraBooksList);
-    protected static String gmaraRefRegex = RefRegex.refRegexInit(gmaraBooks, null, sheetPrefix, location, pagePrefix, pageRegx);
+    protected static String gmaraRefRegex = RefRegex.refRegexInit(gmaraBooks, null, pagePrefix, location, sheetPrefix, sheetRegx);
 
 
     WikiGmaraRefs(String book){
@@ -69,5 +69,13 @@ public class WikiGmaraRefs extends WikiBookRefs {
     }
     public String getBooks(){
         return gmaraBooks;
+    }
+
+    String formateReference(String reference) {
+        reference = super.formateReference(reference);
+        String[] refSplit = reference.split(",");
+        refSplit[2] = refSplit[2].replaceAll("ע", "");
+        reference = refSplit[0] + "," + refSplit[1] + "," + refSplit[2];
+        return reference;
     }
 }

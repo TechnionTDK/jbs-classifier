@@ -4,7 +4,7 @@ import java.util.List;
 
 public class WikiTanachRefs extends WikiBookRefs {
 
-    protected static List<String> badWords = Arrays.asList( "פסוקים", "פסוק", "\\\'", "\\\"", "ספר", "פרק", "\\.", "\\)", "\\(" );
+    protected static List<String> badWords = Arrays.asList( "פסוקים", "פסוק", "ספר", "פרק" );
 
 
     static List<String> booksBand = Arrays.asList("רבה");
@@ -40,6 +40,7 @@ public class WikiTanachRefs extends WikiBookRefs {
             "זכריה" ,
             "מלאכי" ,
             "תהלים" ,
+            "תהילים" ,
             "משלי" ,
             "איוב" ,
             "שיר השירים" ,
@@ -55,7 +56,7 @@ public class WikiTanachRefs extends WikiBookRefs {
     );
 
     protected static String tanachBooks = RefRegex.booksInit(tanachBooksList);
-    protected static String tanachRefRegex = RefRegex.refRegexInit(tanachBooks,booksBand,perekPrefix,location,pasukPrefix,location);
+    protected static String tanachRefRegex = RefRegex.refRegexInit(tanachBooks, booksBand, perekPrefix, location, pasukPrefix, location);
 
 
     WikiTanachRefs(String book){

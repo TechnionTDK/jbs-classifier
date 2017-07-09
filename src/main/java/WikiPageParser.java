@@ -1,7 +1,10 @@
+import com.sun.deploy.util.BlackList;
 import org.apache.jena.atlas.lib.ListUtils;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
+import org.jsoup.safety.Cleaner;
+import org.jsoup.safety.Whitelist;
 import org.jsoup.select.Elements;
 
 import java.io.IOException;
@@ -81,8 +84,15 @@ public class WikiPageParser {
     void getAllPageRef(){
         tanachRefs = new WikiTanachRefs(mainBook);
         gmaraRefs = new WikiGmaraRefs(mainBook);
-        tanachRefs.getAllBookRefs(jsoupDoc);
-        gmaraRefs.getAllBookRefs(jsoupDoc);
+        System.out.println("tanach topic refs");
+        tanachRefs.addTitleSources(jsoupDoc);
+        System.out.println("gmara topic refs");
+        gmaraRefs.addTitleSources(jsoupDoc);
+        jsoupDoc = new Cleaner(Whitelist.relaxed().removeTags("a") ).clean(jsoupDoc);
+        System.out.println("tanach text refs");
+        tanachRefs.addTextSources(jsoupDoc);
+        System.out.println("gmara text refs");
+        gmaraRefs.addTextSources(jsoupDoc);
     }
 
 

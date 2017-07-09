@@ -13,6 +13,7 @@ abstract public class WikiBookRefs {
     String mainBook;
     List<Source> sourceList=new LinkedList<Source>();
     static String location = "([א-ת&&[^ץ,^ף,^ן,^ך,^ם]][\\\"]?){1,3}[\\']?";
+    static List<String> badWords = Arrays.asList("\\\'", "\\\"", "\\.", ";", "\\)", "\\(");
 
 
     WikiBookRefs(String book){
@@ -26,13 +27,18 @@ abstract public class WikiBookRefs {
 
 
     String formateReference(String reference) {
+        reference = reference.replaceAll(",", ", ");
         reference = reference.replaceAll("(?i)[\\s]+$", "");
+        reference = reference.replaceAll(",$", "");
+
+        reference = reference.replaceAll(" - ", "-");
 
         String[] refSplit = reference.split("(?<=" + getBooks() + ")");
         refSplit[1] = refSplit[1].replaceAll("[\\s]+", ", ");
         reference = refSplit[0] + refSplit[1];
 
         reference = reference.replaceAll("(?i),,", ",");
+
         return reference;
     }
 
@@ -42,9 +48,9 @@ abstract public class WikiBookRefs {
             //for (int i = 0; i < m.groupCount(); i++) {
             //System.out.println("0" + ":" + m.group(0));
             //}
+            //System.out.println("0" + ":" + m.group(0));
             String reference = m.group(0);
-            reference = StringUtils.cleanString(reference,getBadWords());
-
+            reference = StringUtils.cleanString(reference,badWords);
             reference = formateReference(reference);
             //System.out.println("final filter:" );
             System.out.println( reference );
@@ -85,11 +91,15 @@ abstract public class WikiBookRefs {
             //System.out.println("parent:" + titleElement.parent().text());
             //System.out.println("**");
             Matcher m = StringUtils.findRegInString(StringUtils.cleanString(titleElement.parent().text(),getBadWords()),getRefRegx());
-            if (!m.find())
+/*            if (!m.find())
                 m = StringUtils.findRegInString(StringUtils.cleanString(titleElement.attr("title"),getBadWords()),getRefRegx());
             else
                 m.reset();
 
+            addRefElement(m);
+*/
+            if (m.find()) return;
+            m = StringUtils.findRegInString(StringUtils.cleanString(titleElement.attr("title"),getBadWords()),getRefRegx());
             addRefElement(m);
         }
     }
@@ -102,15 +112,6 @@ abstract public class WikiBookRefs {
             Matcher m = StringUtils.findRegInString(StringUtils.cleanString(textElement.text(),getBadWords()),getRefRegx());
             addRefElement(m);
         }
-    }
-
-    void getAllBookRefs(Document jsoupDoc){
-        addQuoteSources(jsoupDoc);
-        System.out.println("*finished blockes*");
-        addTitleSources(jsoupDoc);
-        System.out.println("*finished Title*");
-        addTextSources(jsoupDoc);
-        System.out.println("*finished Text* \n");
     }
 }
 
