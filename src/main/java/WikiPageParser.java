@@ -4,7 +4,7 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.safety.Cleaner;
-
+import org.jsoup.safety.*;
 import org.jsoup.safety.Whitelist;
 import org.jsoup.select.Elements;
 
@@ -91,9 +91,8 @@ public class WikiPageParser {
         tanachRefs.addTitleSources(jsoupDoc);
         System.out.println("gmara topic refs");
         gmaraRefs.addTitleSources(jsoupDoc);
-    //   jsoupDoc=new Cleaner(Whitelist.relaxed().removeTags("a") ).clean(jsoupDoc);
-        //Whitelist wl = new Whitelist().relaxed();
-      //  new Cleaner(wl).clean(jsoupDoc);
+    jsoupDoc=new Cleaner(Whitelist.simpleText()).clean(jsoupDoc);
+      
         System.out.println("tanach text refs");
         tanachRefs.addTextSources(jsoupDoc);
         System.out.println("gmara text refs");
