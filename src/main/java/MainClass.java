@@ -14,7 +14,7 @@ import java.util.Collections;
 public class MainClass {
 
     private static final boolean multiThread = false;
-    private static final boolean allWiki = true;
+    private static final boolean allWiki = false;
 
     public static void main(String[] args) {
         String[] topicss = {"https://he.wikipedia.org/wiki/%D7%99%D7%A6%D7%99%D7%90%D7%AA_%D7%9E%D7%A6%D7%A8%D7%99%D7%9D",
