@@ -92,7 +92,7 @@ public class WikiPageParser {
         System.out.println("gmara topic refs");
         gmaraRefs.addTitleSources(jsoupDoc);
     jsoupDoc=new Cleaner(Whitelist.simpleText()).clean(jsoupDoc);
-      
+
         System.out.println("tanach text refs");
         tanachRefs.addTextSources(jsoupDoc);
         System.out.println("gmara text refs");
