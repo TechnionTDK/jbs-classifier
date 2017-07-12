@@ -1,21 +1,18 @@
-import com.sun.deploy.util.BlackList;
-import org.apache.jena.atlas.lib.ListUtils;
+
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.safety.Cleaner;
-import org.jsoup.safety.*;
 import org.jsoup.safety.Whitelist;
 import org.jsoup.select.Elements;
 
 import java.io.IOException;
-import java.net.URI;
-import java.net.URLDecoder;
+
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Arrays;
+
 import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+
 
 /**
  * Created by eurocom on 12/05/2017.
