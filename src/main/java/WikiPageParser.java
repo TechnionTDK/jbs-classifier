@@ -36,10 +36,17 @@ public class WikiPageParser {
 
 
     WikiPageParser(String wikiPageURL) throws IOException {
-        url=wikiPageURL;
-        url=URI.create(url).toASCIIString();
-        org.jsoup.Connection conn = Jsoup.connect(url);
-        jsoupDoc = conn.get();
+        try {
+            url = URI.create(wikiPageURL).toASCIIString();
+            org.jsoup.Connection conn = Jsoup.connect(url);
+            jsoupDoc = conn.get();
+        } catch (Exception e) {
+            System.out.println("DBpedia methot failed");
+            url=wikiPageURL;
+            org.jsoup.Connection conn = Jsoup.connect(URLDecoder.decode(url));
+            jsoupDoc = conn.get();
+        }
+
     }
 
 

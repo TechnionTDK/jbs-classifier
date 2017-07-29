@@ -21,21 +21,36 @@ public class Runner implements Runnable{
             WikiPageParser newWiki = new WikiPageParser(url);
             newWiki.WikiPageMain();
 
-            JsonTuple jt=new JsonTuple();
+            JsonTuple jt = new JsonTuple();
             jt.setUri(url);
             for(Source source : newWiki.tanachRefs.sourceList){
-                System.out.println(source);
-                ArrayList<String> uris=new UriConverter(source.fullRef).getUris();
-                jt.setMentions(uris);
+                System.out.println(source.fullRef);
+                try {
+                    ArrayList<String> uris = new UriConverter(source.fullRef).getUris();
+                    for (String uri : uris) System.out.println(uri);
+                    jt.setMentions(uris);
+                } catch (Exception e) { System.out.println(e);}
             }
             for(Source source : newWiki.gmaraRefs.sourceList){
                 source.fullRef="מסכת "+source.fullRef;
-                System.out.println(source);
-                ArrayList<String> uris=new UriConverter(source.fullRef).getUris();
-                jt.setMentions(uris);
+                System.out.println(source.fullRef);
+                try {
+                    ArrayList<String> uris=new UriConverter(source.fullRef).getUris();
+                    jt.setMentions(uris);
+                } catch (Exception e) { System.out.println(e);}
             }
             if(!jt.mentions.isEmpty()){
-            this.list.addJsonTuple(jt);}
+                this.list.addJsonTuple(jt);
+            }
+
+
+            FileWriter writer = new FileWriter(newWiki.pageTopic + ".json") ;
+            Gson gson = new GsonBuilder().setPrettyPrinting().create();
+            String tupleJson = gson.toJson(this.list);
+            gson.toJson(tupleJson);
+            writer.write(tupleJson);
+            writer.close();
+
         } catch (IOException e) {
             e.printStackTrace();
         }
