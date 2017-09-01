@@ -9,25 +9,6 @@ import java.util.regex.Pattern;
 
 public class StringUtils {
 
-/*    public static enum dbgFlags {
-	NONE(0x0),
-    	WIKI(0x1),
-	FOUND(0x2),
-	FINAL(0x4);
-
-	int id;
-
-	dbgFlags(int id) {
-        	this.id = id;
-    	}
-    }	
-
-    public static int enabledFlags = dbgFlags.WIKI.id;
-
-    public static void dbg(int flags, String s){
-	if ((flags & enabledFlags) != 0)  System.out.println(s);
-    }  
-*/
     public static Matcher findRegInString(String elementText, String regex) {
         Pattern p = Pattern.compile(regex, Pattern.DOTALL);
         Matcher m = p.matcher(elementText);
