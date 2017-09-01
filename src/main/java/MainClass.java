@@ -14,7 +14,7 @@ import java.util.Collections;
 public class MainClass {
 
     private static final boolean multiThread = false;
-    private static final boolean allWiki = false;
+    private static final boolean allWiki = true;
 
     public static void main(String[] args) {
         String[] topics = {"https://he.wikipedia.org/wiki/%D7%99%D7%A6%D7%99%D7%90%D7%AA_%D7%9E%D7%A6%D7%A8%D7%99%D7%9D",
@@ -36,7 +36,7 @@ public class MainClass {
                 "https://he.wikipedia.org/wiki/%D7%AA%D7%9C%D7%9E%D7%95%D7%93_%D7%91%D7%91%D7%9C%D7%99"
         };
         //BasicConfigurator.configure();
-        ArrayList<String> urls = allWiki ? new Queries().getAllWikipediaPages() : new ArrayList<String>(Arrays.asList(topicss));
+        ArrayList<String> urls = allWiki ? new Queries().getAllWikipediaPages() : new ArrayList<String>(Arrays.asList(topics));
 
         for(String url:urls) {
             if (multiThread)

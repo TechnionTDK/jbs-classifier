@@ -2,6 +2,7 @@
 .idea/workspace.xml
 *.iml
 *.iws
+*.json
 log/
 target/
 out/

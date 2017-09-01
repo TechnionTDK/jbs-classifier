@@ -5,11 +5,13 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 
+//import StringUtils;
+
 /**
  * Created by netanel on 26/06/2017.
  */
 public class Runner implements Runnable{
-    static JsonList list = new JsonList();
+    JsonList list = new JsonList();
     String url;
 
     public Runner(String URL){
@@ -23,25 +25,28 @@ public class Runner implements Runnable{
 
             JsonTuple jt = new JsonTuple();
             jt.setUri(url);
+
             for(Source source : newWiki.tanachRefs.sourceList){
-                System.out.println(source.fullRef);
+                Dbg.dbg(Dbg.FINAL.id, source.fullRef);
                 try {
                     ArrayList<String> uris = new UriConverter(source.fullRef).getUris();
-                    for (String uri : uris) System.out.println(uri);
+                    for (String uri : uris) Dbg.dbg(Dbg.URI.id, uri);
                     jt.setMentions(uris);
                 } catch (Exception e) { System.out.println(e);}
             }
             for(Source source : newWiki.gmaraRefs.sourceList){
                 source.fullRef="מסכת "+source.fullRef;
-                System.out.println(source.fullRef);
+                Dbg.dbg(Dbg.FINAL.id, source.fullRef);
                 try {
                     ArrayList<String> uris=new UriConverter(source.fullRef).getUris();
+		    for (String uri : uris) Dbg.dbg(Dbg.URI.id, uri);
                     jt.setMentions(uris);
                 } catch (Exception e) { System.out.println(e);}
             }
-            if(!jt.mentions.isEmpty()){
+            
+	    if(!jt.mentions.isEmpty()){
                 this.list.addJsonTuple(jt);
-            }
+            } else return;
 
 
             FileWriter writer = new FileWriter(newWiki.pageTopic + ".json") ;

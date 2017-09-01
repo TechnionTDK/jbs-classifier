@@ -1,4 +1,4 @@
-import com.sun.deploy.util.BlackList;
+//import com.sun.deploy.util.BlackList;
 import org.apache.jena.atlas.lib.ListUtils;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -41,7 +41,7 @@ public class WikiPageParser {
             org.jsoup.Connection conn = Jsoup.connect(url);
             jsoupDoc = conn.get();
         } catch (Exception e) {
-            System.out.println("DBpedia methot failed");
+            Dbg.dbg(Dbg.ERROR.id,"DBpedia methot failed");
             url=wikiPageURL;
             org.jsoup.Connection conn = Jsoup.connect(URLDecoder.decode(url));
             jsoupDoc = conn.get();
@@ -60,7 +60,7 @@ public class WikiPageParser {
             //do somthing!!
         }
         pageTopic = topicNameElements.first().text();
-        System.out.println(topicNameElements.first().text());
+        Dbg.dbg(Dbg.ANY.id, "\nנושא: " + topicNameElements.first().text());
     }
 
     void findMainBook(){
@@ -79,13 +79,13 @@ public class WikiPageParser {
         Matcher m = StringUtils.findRegInString(bookElements.first().text(),costumeBookRegex);
         if (m.find())
             mainBook = m.group(0);
-        System.out.println(mainBook);
+        Dbg.dbg(Dbg.PAGE.id|Dbg.CAT.id, mainBook);
     }
 
     void findCategories(){
 
         for (Element categoryElement : jsoupDoc.select(bookPath + "[title~=" + "קטגוריה:" + "]")){
-            System.out.println(categoryElement.text());
+            Dbg.dbg(Dbg.CAT.id,categoryElement.text());
             categoriesList.add(categoryElement.text());
         }
     }
@@ -93,14 +93,17 @@ public class WikiPageParser {
     void getAllPageRef(){
         tanachRefs = new WikiTanachRefs(mainBook);
         gmaraRefs = new WikiGmaraRefs(mainBook);
-        System.out.println("tanach topic refs");
+        Dbg.dbg(Dbg.FOUND.id,"רפרנסים תנך בפורמט וויקי (בלבד)");
         tanachRefs.addTitleSources(jsoupDoc);
-        System.out.println("gmara topic refs");
+        Dbg.dbg(Dbg.FOUND.id,"רפרנסים גמרה בפורמט וויקי (בלבד)");
         gmaraRefs.addTitleSources(jsoupDoc);
-        jsoupDoc = new Cleaner(Whitelist.relaxed().removeTags("a") ).clean(jsoupDoc);
-        System.out.println("tanach text refs");
+	Whitelist wl = new Whitelist().none();
+	wl.addTags("b", "blockquote", "br", "caption", "cite", "code", "col", "colgroup", "dd", "div", "dl", "dt", "em", "h1", "h2", "h3", "h4", "h5", "h6", "i", "img", "li", "ol", "p", "pre", "q", "small", "span", "strike", "strong", "sub", "sup", "table", "tbody", "td", "tfoot", "th", "thead", "tr", "u", "ul");
+	jsoupDoc = new Cleaner(wl).clean(jsoupDoc);
+	//jsoupDoc = new Cleaner(Whitelist.simpleText() ).clean(jsoupDoc);
+        Dbg.dbg(Dbg.FOUND.id,"רפרנסים תנך מהטקסט");
         tanachRefs.addTextSources(jsoupDoc);
-        System.out.println("gmara text refs");
+        Dbg.dbg(Dbg.FOUND.id,"רפרנסים גמרה מהטקסט");
         gmaraRefs.addTextSources(jsoupDoc);
     }
 

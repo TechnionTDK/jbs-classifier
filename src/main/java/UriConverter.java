@@ -83,7 +83,7 @@ public class UriConverter {
 
            this.uris.add(uri);}
            catch (Exception e){
-               System.out.println("failed converting: "+source);
+               Dbg.dbg(Dbg.ERROR.id,"המרת uri נכשלה " + source);
            }
         }
         return this.uris;

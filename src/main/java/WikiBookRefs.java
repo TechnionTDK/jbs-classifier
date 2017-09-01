@@ -55,7 +55,7 @@ abstract public class WikiBookRefs {
             reference = StringUtils.cleanString(reference,badWords);
             reference = formateReference(reference);
             //System.out.println("final filter:" );
-            System.out.println( reference );
+            Dbg.dbg(Dbg.FOUND.id, reference );
             //System.out.println("-----------------");
             Source source = new Source(reference, mainBook);
             sourceList.add(source);

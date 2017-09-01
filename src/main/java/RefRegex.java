@@ -58,7 +58,7 @@ public class RefRegex {
         buildRefRegex += loc2;
         buildRefRegex += locationRange(loc2);
         buildRefRegex += orList(suffix);
-        System.out.println(buildRefRegex);
+        Dbg.dbg(Dbg.INFO.id,buildRefRegex);
         return buildRefRegex;
     }
 }
