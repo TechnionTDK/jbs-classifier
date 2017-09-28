@@ -39,11 +39,16 @@ public class MainClass {
         ArrayList<String> urls = allWiki ? new Queries().getAllWikipediaPages() : new ArrayList<String>(Arrays.asList(topics));
 
         for(String url:urls) {
-            if (multiThread)
-                new Thread(new Runner(url)).start();
-            else
-                new Runner(url).run();
-        }
+		try {
+            		if (multiThread)
+                		new Thread(new Runner(url)).start();
+            		else
+                		new Runner(url).run();
+        	} catch (Exception e) {
+		    System.out.println("WE SHOULD NOT GET HERE !!!! \n" + url);
+	            e.printStackTrace();
+        	}	
+	}
     }
 
 }

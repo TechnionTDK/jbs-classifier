@@ -49,14 +49,16 @@ public class Runner implements Runnable{
             } else return;
 
 
-            FileWriter writer = new FileWriter(newWiki.pageTopic + ".json") ;
-            Gson gson = new GsonBuilder().setPrettyPrinting().create();
+            FileWriter writer = new FileWriter("outputs/" + newWiki.pageTopic + ".json") ;
+            System.out.println("creating file: outputs/" + newWiki.pageTopic + ".json");
+	    Gson gson = new GsonBuilder().setPrettyPrinting().create();
             String tupleJson = gson.toJson(this.list);
             gson.toJson(tupleJson);
             writer.write(tupleJson);
             writer.close();
 
-        } catch (IOException e) {
+        } catch (Exception e) {
+	    System.out.println(url);
             e.printStackTrace();
         }
     }

@@ -7,6 +7,7 @@ import org.jsoup.safety.Cleaner;
 import org.jsoup.safety.Whitelist;
 import org.jsoup.select.Elements;
 
+import java.util.concurrent.TimeUnit;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URLDecoder;
@@ -35,18 +36,33 @@ public class WikiPageParser {
 
 
 
-    WikiPageParser(String wikiPageURL) throws IOException {
+    WikiPageParser(String wikiPageURL) throws IOException, InterruptedException {
+	int i=0;
+	while (true)
+	{
         try {
             url = URI.create(wikiPageURL).toASCIIString();
             org.jsoup.Connection conn = Jsoup.connect(url);
             jsoupDoc = conn.get();
+	    break;
         } catch (Exception e) {
-            Dbg.dbg(Dbg.ERROR.id,"DBpedia methot failed");
-            url=wikiPageURL;
-            org.jsoup.Connection conn = Jsoup.connect(URLDecoder.decode(url));
-            jsoupDoc = conn.get();
-        }
-
+		try {
+            		Dbg.dbg(Dbg.ERROR.id,"DBpedia methot failed");
+            		url=wikiPageURL;
+            		org.jsoup.Connection conn = Jsoup.connect(URLDecoder.decode(url));
+            		jsoupDoc = conn.get();
+	    		break;
+       		} catch (Exception ex) {
+			Dbg.dbg(Dbg.ERROR.id,"Wiki get failed, will try again in 2");
+			if (i>5){
+				Dbg.dbg(Dbg.ERROR.id,"Final: fail to get" + url); 
+				throw ex;
+			}
+			i++;
+			TimeUnit.SECONDS.sleep(5);
+		}
+	}
+	}
     }
 
 
