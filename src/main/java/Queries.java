@@ -45,10 +45,10 @@ public class Queries {
         int offset=0;
         ParameterizedSparqlString queryStr = new ParameterizedSparqlString();
         ArrayList<String> urls = new ArrayList<String>();
-        for(int i=0; i<1; i++) {
+        for(int i=0; i<90; i++) {
             queryStr.setCommandText("PREFIX foaf: <http://xmlns.com/foaf/0.1/>\n" +
                     "PREFIX dbo: <http://dbpedia.org/ontology/>\n" +
-                    "SELECT ?s FROM <http://he.dbpedia.org> WHERE {?s a foaf:Document. }  LIMIT 2000 OFFSET " + offset);
+                    "SELECT ?s FROM <http://he.dbpedia.org> WHERE {?s a foaf:Document. }  LIMIT 5000 OFFSET " + offset);
             Query q;
             q = queryStr.asQuery();
             QueryExecution qExe = QueryExecutionFactory.sparqlService("http://tdk3.csf.technion.ac.il:8890/sparql", q);
