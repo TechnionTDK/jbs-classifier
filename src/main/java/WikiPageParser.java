@@ -37,32 +37,32 @@ public class WikiPageParser {
 
 
     WikiPageParser(String wikiPageURL) throws IOException, InterruptedException {
-	int i=0;
-	while (true)
-	{
-        try {
-            url = URI.create(wikiPageURL).toASCIIString();
-            org.jsoup.Connection conn = Jsoup.connect(url);
-            jsoupDoc = conn.get();
-	    break;
-        } catch (Exception e) {
-		try {
-            		Dbg.dbg(Dbg.ERROR.id,"DBpedia methot failed");
-            		url=wikiPageURL;
-            		org.jsoup.Connection conn = Jsoup.connect(URLDecoder.decode(url));
-            		jsoupDoc = conn.get();
-	    		break;
-       		} catch (Exception ex) {
-			Dbg.dbg(Dbg.ERROR.id,"Wiki get failed, will try again in 2");
-			if (i>5){
-				Dbg.dbg(Dbg.ERROR.id,"Final: fail to get" + url); 
-				throw ex;
-			}
-			i++;
-			TimeUnit.SECONDS.sleep(5);
-		}
-	}
-	}
+	    int i=0;
+	    while (true)
+        {
+            try {
+                url = URI.create(wikiPageURL).toASCIIString();
+                org.jsoup.Connection conn = Jsoup.connect(url);
+                jsoupDoc = conn.get();
+                break;
+            } catch (Exception e) {
+                try {
+                    Dbg.dbg(Dbg.ERROR.id,"DBpedia methot failed");
+                    url=wikiPageURL;
+                    org.jsoup.Connection conn = Jsoup.connect(URLDecoder.decode(url));
+                    jsoupDoc = conn.get();
+                    break;
+                } catch (Exception ex) {
+                    Dbg.dbg(Dbg.ERROR.id,"Wiki get failed for:\n" + url + "\nwill try again in 1");
+                    if (i>0){
+                        Dbg.dbg(Dbg.ERROR.id,"Final: fail to get" + url);
+                        throw ex;
+                    }
+                    i++;
+                    TimeUnit.SECONDS.sleep(1);
+                }
+            }
+        }
     }
 
 

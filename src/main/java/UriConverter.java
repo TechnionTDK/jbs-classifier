@@ -1,5 +1,6 @@
 import org.apache.jena.query.*;
-
+import java.io.FileWriter;
+import java.io.IOException;
 
 import java.util.ArrayList;
 
@@ -75,19 +76,27 @@ public class UriConverter {
         for (String pasuk : this.psukim) {
             String source=""  +" \""+this.sefer+" "+this.perek+" "+pasuk+"\"";
             ResultSet results = new Queries().findUris(source);
-           try{String uri= ResultSetFormatter.toList(results).get(0).toString();
-           uri=uri.split("text-")[1];
-            uri=uri.split(">")[0];
-            uri="jbr:"+uri;
+           try{
+               String uri= ResultSetFormatter.toList(results).get(0).toString();
+                uri=uri.split("text-")[1];
+                uri=uri.split(">")[0];
+                uri="jbr:"+uri;
 
 
-           this.uris.add(uri);}
-           catch (Exception e){
-               Dbg.dbg(Dbg.ERROR.id,"המרת uri נכשלה " + source);
+                this.uris.add(uri);}
+                catch (Exception e){
+                Dbg.dbg(Dbg.ERROR.id,"המרת uri נכשלה " + source);
+    /*
+		    try {
+		        FileWriter failRefs = new FileWriter("stat/fail_refs",true);
+		        failRefs.write(this.sefer+" "+this.perek+" "+pasuk+"\n");
+		        failRefs.close();
+		    } catch (Exception ee) {}
+	*/
            }
         }
-        return this.uris;
 
+        return this.uris;
     }
 
 
