@@ -38,3 +38,10 @@ The ouput is in the following json format:
 ```
 ## Cloning the project
 Using git: git clone https://github.com/TechnionTDK/jbs-classifier.git
+
+## Running the project
+
+## Main classes
+| class | purpose |
+| ------ | ------ |
+
