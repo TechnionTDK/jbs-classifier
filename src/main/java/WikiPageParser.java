@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.Arrays;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
+import java.io.FileWriter;
 /**
  * Created by eurocom on 12/05/2017.
  */
@@ -54,6 +54,11 @@ public class WikiPageParser {
                     break;
                 } catch (Exception ex) {
                     Dbg.dbg(Dbg.ERROR.id,"Wiki get failed for:\n" + url + "\nwill try again in 1");
+                    if(i==0) {
+                        FileWriter errPages = new FileWriter("stat/error_pages", true);
+                        errPages.write(url + "\n");
+                        errPages.close();
+                    }
                     if (i>0){
                         Dbg.dbg(Dbg.ERROR.id,"Final: fail to get" + url);
                         throw ex;

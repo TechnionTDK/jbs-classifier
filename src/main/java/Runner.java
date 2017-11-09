@@ -34,8 +34,7 @@ public class Runner implements Runnable{
             FileWriter refsPages = new FileWriter("stat/pages_with_refs",true);
             FileWriter pageRefs = new FileWriter("stat/pages_refs",true);
 
-            JsonTuple jt = new JsonTuple();
-            jt.setUri(url);
+            JsonTuple jt = new JsonTuple(url,newWiki.pageTopic);
 
 	        allPages.write(newWiki.pageTopic + "\n");
 	        allPages.close();
@@ -96,9 +95,8 @@ public class Runner implements Runnable{
                 this.list.addJsonTuple(jt);
             } else return;
 
-
-	        FileWriter writer = new FileWriter("outputs/" + newWiki.pageTopic + ".json");
-	        System.out.println("creating file: outputs/" + newWiki.pageTopic + ".json");
+	        FileWriter writer = new FileWriter("outputs.json",true);
+	        System.out.println("adding topic to outputs:" + newWiki.pageTopic);
 	        Gson gson = new GsonBuilder().setPrettyPrinting().create();
 	        String tupleJson = gson.toJson(this.list);
 	        gson.toJson(tupleJson);

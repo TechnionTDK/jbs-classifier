@@ -11,6 +11,7 @@ import java.util.ArrayList;
  */
 public class JsonTuple {
     String uri;
+    String topic;
     @SerializedName("jbo:mentions")
     ArrayList<String> mentions;
 
@@ -19,11 +20,15 @@ public class JsonTuple {
         this.mentions=new ArrayList<String>();
 
     }
+    public JsonTuple(String uri, String topic){
+        this.uri=uri;
+        this.topic=topic;
+        this.mentions=new ArrayList<String>();
+    }
     public JsonTuple(String uri, ArrayList<String> mentions){
         this.mentions=new ArrayList<String>();
         setUri(uri);
         setMentions(mentions);
-
     }
     public void setUri(String uri){
         this.uri=uri;
