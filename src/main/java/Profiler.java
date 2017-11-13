@@ -3,8 +3,13 @@ import org.apache.commons.lang3.mutable.MutableLong;
 
 import java.util.Date;
 
-/**
+/*
  * Created by eurocom on 31/10/2017.
+ * Platform to calculate run time of different parts of the code.
+ * Platform provide two functions:
+ *  1) resetTimer - reset the start time to now, adding runtime since last reset to 'other'.
+ *  2) sumRestartTimer - reset the start time to now, adding runtime since last reset to given timer
+ *     and increasing number of period counter for this timer.
  */
 public class Profiler {
     long startTime = new Date().getTime();

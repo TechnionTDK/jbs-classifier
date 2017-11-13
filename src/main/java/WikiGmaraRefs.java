@@ -3,12 +3,16 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
+/* Inherit and relay on WikiBookRefs functionality.
+ * supplying it relevant gmara regex and adding some extra unique formatting
+ */
 public class WikiGmaraRefs extends WikiBookRefs {
 
     protected static List<String> badWords = Arrays.asList("דפים","עמודים","עמוד","דף");
 
     static List<String> sheetPrefix = Arrays.asList("עמוד", "עמודים");
     static List<String> pagePrefix = Arrays.asList("דפים", "דף");
+    static String sheetRegxMin = "([א,ב])[\\']?";
     static String sheetRegx = "(ע[\\\"])?" + "([א,ב])[\\']?";
     static List<String> booksBand = Arrays.asList("");
 
@@ -63,7 +67,6 @@ public class WikiGmaraRefs extends WikiBookRefs {
     protected List<String> getBadWords() {
         return badWords;
     }
-
     protected String getRefRegx(){
         return gmaraRefRegex;
     }
@@ -71,6 +74,7 @@ public class WikiGmaraRefs extends WikiBookRefs {
         return gmaraBooks;
     }
 
+    /* remove ע standing from עמוד*/
     String formateReference(String reference) {
         reference = super.formateReference(reference);
         String[] refSplit = reference.split(",");

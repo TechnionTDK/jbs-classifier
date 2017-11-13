@@ -2,6 +2,9 @@ import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
+/* Inherit and relay on WikiBookRefs functionality.
+ * supplying it relevant Tanach regex and adding some extra unique formatting
+ */
 public class WikiTanachRefs extends WikiBookRefs {
 
     protected static List<String> badWords = Arrays.asList( "פסוקים", "פסוק", "ספר", "פרק" );

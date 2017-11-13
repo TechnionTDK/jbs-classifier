@@ -1,8 +1,11 @@
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
+import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.ArrayList;
 import java.util.Date;
 
@@ -10,106 +13,140 @@ import java.util.Date;
 
 /**
  * Created by netanel on 26/06/2017.
+ * Represent a thread dedicated to process a specific wiki page.
+ * initialized with the Wiki page url and the global profiler object.
  */
-public class Runner implements Runnable{
-    JsonList list = new JsonList();
+
+public class Runner implements Runnable {
     String url;
     Profiler profiler;
+    int uriExist=0;
 
-    public Runner(String URL, Profiler prof){
+    WikiPageParser newWiki;
+    JsonTuple jt;
+
+    /* stats file */
+    FileWriter pagesUri;
+    FileWriter pageRefs;
+
+
+    public Runner(String URL, Profiler prof) throws Exception {
         url = URL;
         profiler = prof;
+
+        new File("stat/").mkdirs();
     }
 
     public void run(){
         try {
             profiler.restartTimer();
-            WikiPageParser newWiki = new WikiPageParser(url);
+            /* Fetching wiki page */
+            newWiki = new WikiPageParser(url);
             profiler.sumRestartTimer(profiler.nFetchWiki, profiler.fetchWikiTotalTime);
+        } catch (Exception e) {
+            return;
+        }
+
+        try {
+            /* Parsing wiki page */
             newWiki.WikiPageMain();
             profiler.sumRestartTimer(profiler.nProcWikiPages, profiler.procWikiTotalTime);
-            FileWriter allPages = new FileWriter("stat/all_pages",true);
-            FileWriter uriPages = new FileWriter("stat/pages_with_url",true);
-            FileWriter pagesUri = new FileWriter("stat/pages_url",true);
-            FileWriter refsPages = new FileWriter("stat/pages_with_refs",true);
-            FileWriter pageRefs = new FileWriter("stat/pages_refs",true);
+            jt = new JsonTuple(url, newWiki.pageTopic);
+            FileWriter allPages = new FileWriter("stat/all_pages", true);
+            allPages.write(newWiki.pageTopic + "\n");
+            allPages.close();
 
-            JsonTuple jt = new JsonTuple(url,newWiki.pageTopic);
+            /* Converting found reference to URIs and adding to JsonTuple */
+            handelSourceLists();
 
-	        allPages.write(newWiki.pageTopic + "\n");
-	        allPages.close();
-	        int uriExist=0;
-	        if (!newWiki.tanachRefs.sourceList.isEmpty()){
-		        refsPages.write(newWiki.pageTopic + "\n");
-                pageRefs.write(newWiki.pageTopic + ":\n");
-	        }
+            /* writing updated profiler information to file */
+            writeProfiler();
 
-            profiler.restartTimer();
-            for(Source source : newWiki.tanachRefs.sourceList){
-                Dbg.dbg(Dbg.FINAL.id, source.fullRef);
-		        pageRefs.write(source.fullRef + "\n");
-                try {
-                    ArrayList<String> uris = new UriConverter(source.fullRef).getUris();
-		            if(!uris.isEmpty() && uriExist==0){
-		    	        uriExist=1;
-			            uriPages.write(newWiki.pageTopic + "\n");
-	                    pagesUri.write(newWiki.pageTopic + ":\n");
-		            }
-                    for (String uri : uris) {
-			            Dbg.dbg(Dbg.URI.id, uri);
-			            pagesUri.write(uri + "\n");
-		            }
-                    jt.setMentions(uris);
-                } catch (Exception e) { System.out.println(e);}
-            }
-	        int gFirst=1;
-            for(Source source : newWiki.gmaraRefs.sourceList){
-                source.fullRef="מסכת "+source.fullRef;
-                Dbg.dbg(Dbg.FINAL.id, source.fullRef);
-                try {
-                    ArrayList<String> uris=new UriConverter(source.fullRef).getUris();
-		            for (String uri : uris) Dbg.dbg(Dbg.URI.id, uri);
-                    jt.setMentions(uris);
-                } catch (Exception e) { System.out.println(e);}
-            }
-            profiler.sumRestartTimer(profiler.numConverts, profiler.convUriTotalTime);
+	        if(jt.mentions.isEmpty())
+	            return;
 
-            FileWriter profilerFile = new FileWriter("stat/profiler",false);
-            long sumTimers = profiler.otherTotalTime;
-            sumTimers += profiler.procWikiTotalTime.longValue();
-            sumTimers += profiler.fetchWikiTotalTime.longValue();
-            sumTimers += profiler.convUriTotalTime.longValue();
-            long totTime = new Date().getTime() - profiler.startRunTime;
+            /* write JsonTuple to json file */
+            Dbg.dbg(Dbg.FINAL.id | Dbg.PAGE.id, "מוסיף נושא:  " + newWiki.pageTopic + "\n");
+            writeJsonTuple(jt);
 
-            profilerFile.write("fetch wiki time: " + profiler.fetchWikiTotalTime.longValue() +
-                    "\nfetched wikis: " + profiler.nFetchWiki.intValue() +
-                    "\n\nprocess time: " + profiler.procWikiTotalTime.longValue() +
-                    "\nprocessed pages: " + profiler.nProcWikiPages.intValue() +
-                    "\n\nconvert time: " + profiler.convUriTotalTime.longValue() +
-                    "\nconverted pages: " + profiler.numConverts.intValue() +
-                    "\n\nrest of the time: " + profiler.otherTotalTime +
-                    "\n\ntimers sum: " + sumTimers + "\ntotal time: " + totTime);
-            profilerFile.close();
-
-	        if(!jt.mentions.isEmpty()){
-                this.list.addJsonTuple(jt);
-            } else return;
-
-	        FileWriter writer = new FileWriter("outputs.json",true);
-	        System.out.println("adding topic to outputs:" + newWiki.pageTopic);
-	        Gson gson = new GsonBuilder().setPrettyPrinting().create();
-	        String tupleJson = gson.toJson(this.list);
-	        gson.toJson(tupleJson);
-	        writer.write(tupleJson);
-	        writer.close();
-	        uriPages.close();
-	        pagesUri.close();
-	        refsPages.close();
-	        pageRefs.close();
         } catch (Exception e) {
 	        System.out.println(url);
             e.printStackTrace();
         }
     }
 
+
+    public void handelSourceLists() throws Exception {
+        if (newWiki.tanachRefs.sourceList.isEmpty() && newWiki.gmaraRefs.sourceList.isEmpty())
+            return;
+
+        FileWriter refsPages = new FileWriter("stat/pages_with_refs", true);
+        refsPages.write(newWiki.pageTopic + "\n");
+        refsPages.close();
+
+        pageRefs = new FileWriter("stat/pages_refs", true);
+        pagesUri = new FileWriter("stat/pages_url", true);
+        pageRefs.write(newWiki.pageTopic + ":\n");
+        
+        profiler.restartTimer();
+        sourceList2URIs(newWiki.tanachRefs.sourceList, "");
+        sourceList2URIs(newWiki.gmaraRefs.sourceList, "מסכת ");
+        profiler.sumRestartTimer(profiler.numConverts, profiler.convUriTotalTime);
+
+        pagesUri.close();
+        pageRefs.close();
+    }
+
+
+    public void sourceList2URIs(List<Source> sourceList, String refPref) throws Exception {
+        for(Source source : sourceList){
+            source.fullRef= refPref + source.fullRef;
+            Dbg.dbg(Dbg.FINAL.id, source.fullRef);
+            pageRefs.write(source.fullRef + "\n");
+            try {
+                ArrayList<String> uris = new UriConverter(source.fullRef).getUris();
+                if(!uris.isEmpty() && uriExist==0){
+                    uriExist=1;
+                    FileWriter uriPages = new FileWriter("stat/pages_with_url", true);
+                    uriPages.write(newWiki.pageTopic + "\n");
+                    uriPages.close();
+                    pagesUri.write(newWiki.pageTopic + ":\n");
+                }
+                for (String uri : uris) {
+                    Dbg.dbg(Dbg.URI.id, uri);
+                    pagesUri.write(uri + "\n");
+                }
+                jt.setMentions(uris);
+            } catch (Exception e) { System.out.println(e);}
+        }
+    }
+
+    void writeProfiler() throws Exception {
+        long sumTimers = profiler.otherTotalTime;
+        sumTimers += profiler.procWikiTotalTime.longValue();
+        sumTimers += profiler.fetchWikiTotalTime.longValue();
+        sumTimers += profiler.convUriTotalTime.longValue();
+        long totTime = new Date().getTime() - profiler.startRunTime;
+        FileWriter profilerFile = new FileWriter("stat/profiler", false);
+        profilerFile.write("fetch wiki time: " + profiler.fetchWikiTotalTime.longValue() +
+                "\nfetched wikis: " + profiler.nFetchWiki.intValue() +
+                "\n\nprocess time: " + profiler.procWikiTotalTime.longValue() +
+                "\nprocessed pages: " + profiler.nProcWikiPages.intValue() +
+                "\n\nconvert time: " + profiler.convUriTotalTime.longValue() +
+                "\nconverted pages: " + profiler.numConverts.intValue() +
+                "\n\nrest of the time: " + profiler.otherTotalTime +
+                "\n\ntimers sum: " + sumTimers + "\ntotal time: " + totTime);
+        profilerFile.close();
+    }
+
+    static void writeJsonTuple(JsonTuple jTuple) throws Exception {
+        JsonList jList = new JsonList();
+        jList.addJsonTuple(jTuple);
+        Gson gson = new GsonBuilder().setPrettyPrinting().create();
+        String jString = gson.toJson(jList);
+        gson.toJson(jString);
+        FileWriter writer = new FileWriter("outputs.json", true);
+        writer.write(jString);
+        writer.close();
+    }
 }

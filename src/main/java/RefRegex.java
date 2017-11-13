@@ -2,20 +2,29 @@ import java.lang.reflect.Array;
 import java.util.Arrays;
 import java.util.List;
 
-/**
+/*
  * Created by eurocom on 09/06/2017.
+ * class to wrap reference regex creation.
+ * Supply:
+ * booksInit - to make regex out of list of strings (books)
+ * refRegexInit - to create reference identifying regex.
  */
 public class RefRegex {
-
 
     static List<String> delim = Arrays.asList(",(( )?)", " ");
     static List<String> suffix = Arrays.asList("$", ";", ",", "\\.", " ", "\\)");
 
-
+    /* create range regex of location */
     static String locationRange(String location){
         return "(" + "(( )?)-(( )?)" + location + ")?";
     }
 
+    /* create regex from list of strings
+     * the strings are delimited by delim
+     * pref and suf will be added as prefix and suffix to each string
+     * globPref and globSuf will be added to the whole regex
+     * ToDo - consider less flexible, delim=|, no suf and pref, globPref and glob Suf will be added manually.
+     */
     static String regexFromList(List<String> listString, String delim, String pref, String suf, String globPref, String globSuf){
         String regex = "(" + globPref + "(";
         regex += "(" + pref + listString.get(0) + suf + ")";
@@ -47,6 +56,15 @@ public class RefRegex {
         return orList(booksList);
     }
 
+    /*
+     * create reference identifying regex out of:
+     *      books regex,
+     *      band words (after the book),
+     *      possible strings pre location 1,
+     *      location 1,
+     *      possible strings pre location 2,
+     *      location 2
+     */
     static String refRegexInit(String books, List<String> booksBand, List<String> pref1, String loc1, List<String> pref2, String loc2){
         String buildRefRegex = books + "[\\']?";
         buildRefRegex += orList(delim);

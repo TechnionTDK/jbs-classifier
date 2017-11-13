@@ -11,7 +11,11 @@ import static com.sun.org.apache.xalan.internal.xsltc.compiler.util.Type.String;
 
 /**
  * Created by eurocom on 18/06/2017.
+ * Abstract class, give functionality to find and format references in jsoup document.
+ * class relay on regex provided by it's inheritance classes
+ * references will be saved in 'sourceList'
  */
+
 abstract public class WikiBookRefs {
     String mainBook;
     List<Source> sourceList=new LinkedList<Source>();
@@ -22,12 +26,13 @@ abstract public class WikiBookRefs {
         mainBook = book;
     }
 
+    /* Getters functions to relay on static inheritance class regex */
     abstract protected List<String> getBadWords();
     abstract protected String getRefRegx();
     public abstract String getBooks();
 
 
-
+    /* format the reference by cleaning/adding extra white spaces and comma */
     String formateReference(String reference) {
         reference = reference.replaceAll(",", ", ");
         reference = reference.replaceAll("(?i)[\\s]+$", "");
@@ -44,74 +49,48 @@ abstract public class WikiBookRefs {
         return reference;
     }
 
+    /* For each found reference in the matcher will clean badWords, format and add to sourceList. */
     void addRefElement(Matcher m){
         while (m.find())
         {
-            //for (int i = 0; i < m.groupCount(); i++) {
-            //System.out.println("0" + ":" + m.group(0));
-            //}
-            //System.out.println("0" + ":" + m.group(0));
             String reference = m.group(0);
             reference = StringUtils.cleanString(reference,badWords);
             reference = formateReference(reference);
-            //System.out.println("final filter:" );
             Dbg.dbg(Dbg.FOUND.id, reference );
-            //System.out.println("-----------------");
             Source source = new Source(reference, mainBook);
             sourceList.add(source);
-            /*if (source.validate()) {
-                sourceList.add(source);
-            }*/
+         }
+    }
+
+    /* identify references in Wikipedia quot format (not in use)*/
+    void addQuoteSources(Document jsoupDoc){
+        for( Element quoteElement : jsoupDoc.select("blockquote")){
+            Matcher m = StringUtils.findRegInString(StringUtils.cleanString(quoteElement.text(),getBadWords()),getRefRegx());
+            addRefElement(m);
         }
     }
 
-    void addQuoteSources(Document jsoupDoc){
-/*        for( Element quoteElement : jsoupDoc.select("blockquote")){
-            Source source = new Source(quoteElement,mainBook);
-            if (source.validate()) {
-                sourceList.add(source);
-            }
-            //System.out.println(quoteElement);
-            //System.out.println(quoteElement.text());
-            //System.out.println("**");
-            Matcher m = findRegInString(quoteElement.text(),queryRegex);
-            addRefElement(m);
-        }
- */   }
-
+    /* Identify references in Wikipedia ref format, looking in the title tag.
+     * Will add only references that are not identified as plain text.
+     */
     void addTitleSources(Document jsoupDoc){
-        Element prevElement = new Element(Tag.valueOf("avneravneravner"), "");
-      //  Element prevElement = new Element("avneravneravner");
+        Element prevElement = new Element(Tag.valueOf("dummyValue"), "");
         for( Element titleElement : jsoupDoc.select("[title~=s:"+ getRefRegx())){
             if (titleElement.parent()==prevElement.parent())
                 continue;
             prevElement=titleElement;
 
-            //System.out.println(titleElement);
-            //System.out.println(titleElement.text());
-            //System.out.println(titleElement.attr("title"));
-            //System.out.println("parparent:" + titleElement.parent().parent().text());
-            //System.out.println("parent:" + titleElement.parent().text());
-            //System.out.println("**");
             Matcher m = StringUtils.findRegInString(StringUtils.cleanString(titleElement.parent().text(),getBadWords()),getRefRegx());
-/*            if (!m.find())
-                m = StringUtils.findRegInString(StringUtils.cleanString(titleElement.attr("title"),getBadWords()),getRefRegx());
-            else
-                m.reset();
-
-            addRefElement(m);
-*/
             if (m.find()) return;
+
             m = StringUtils.findRegInString(StringUtils.cleanString(titleElement.attr("title"),getBadWords()),getRefRegx());
             addRefElement(m);
         }
     }
 
+    /* Identify references in Wikipedia plain text. */
     void addTextSources(Document jsoupDoc){
         for( Element textElement : jsoupDoc.select("*:matchesOwn("+getRefRegx()+")")){
-            //System.out.println(textElement.text());
-            //System.out.println(textElement);
-            //System.out.println("**");
             Matcher m = StringUtils.findRegInString(StringUtils.cleanString(textElement.text(),getBadWords()),getRefRegx());
             addRefElement(m);
         }
