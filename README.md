@@ -45,7 +45,7 @@ Using git: git clone https://github.com/TechnionTDK/jbs-classifier.git
 | class | purpose |
 | ------ | ------ |
 | MainClass | assembling all the project components  |
-| Queries | all the SPARL queries are executed here |
+| Queries | all the SPARQL queries are executed here |
 | RefRegex | generic class in order to be able to create regular expressions |
 | Runner | writing the results to the output file |
 | UriConverter | converting hebrew source into a URI |
