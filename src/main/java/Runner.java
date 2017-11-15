@@ -21,6 +21,7 @@ public class Runner implements Runnable {
     String url;
     Profiler profiler;
     int uriExist=0;
+    static JsonList jList = new JsonList();
 
     WikiPageParser newWiki;
     JsonTuple jt;
@@ -33,6 +34,7 @@ public class Runner implements Runnable {
     public Runner(String URL, Profiler prof) throws Exception {
         url = URL;
         profiler = prof;
+
 
         new File("stat/").mkdirs();
     }
@@ -140,7 +142,7 @@ public class Runner implements Runnable {
     }
 
     static void writeJsonTuple(JsonTuple jTuple) throws Exception {
-        JsonList jList = new JsonList();
+
         jList.addJsonTuple(jTuple);
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
         String jString = gson.toJson(jList);
