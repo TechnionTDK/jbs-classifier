@@ -78,7 +78,7 @@ public class UriConverter {
             ResultSet results = new Queries().findUris(source);
            try{
                String uri= ResultSetFormatter.toList(results).get(0).toString();
-                uri=uri.split("resource/")[1];
+                uri=uri.split("text-")[1];
                 uri=uri.split(">")[0];
                 uri="jbr:"+uri;
 
@@ -107,7 +107,7 @@ public class UriConverter {
 
 
 
-          UriConverter u=new UriConverter("בראשית ,ב,א");
+          UriConverter u=new UriConverter("מסכת בבא קמא,ב,א");
 
        System.out.println( u.getUris());
 
