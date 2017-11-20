@@ -56,16 +56,23 @@ Options: [--all|--file <path to file>|--help] [--dbg <debug flags>]
 
 Without any option (or only dbg flag) interactive mode will be used.
 
-Scan output is written to outputs/<timestamp>.json
+Scan output is written to outputs/timestamp.json
 
-Further information is available under 'stat_<timestamp>'
+Further information is available under 'stat_timestamp'
 in the following files:
-all_pages                       All parsed pages
-pages_with_refs                 Pages with potential references
-pages_refs                      Potential references by page
-pages_with_uri                  Pages with references
-pages_uri                       URIs by page
-error_pages                     Un-parsable pages
-profiler                        Run time information of each phase
+
+all_pages - All parsed pages
+
+pages_with_refs - Pages with potential references
+
+pages_refs - Potential references by page
+
+pages_with_uri - Pages with references
+
+pages_uri - URIs by page
+
+error_pages - Un-parsable pages
+
+profiler - Run time information of each phase
 
 Full usage is available by running the program with --help flag.
