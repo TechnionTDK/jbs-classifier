@@ -78,7 +78,7 @@ public class UriConverter {
             ResultSet results = new Queries().findUris(source);
            try{
                String uri= ResultSetFormatter.toList(results).get(0).toString();
-                uri=uri.split("text-")[1];
+                uri=uri.split("resource/")[1];
                 uri=uri.split(">")[0];
                 uri="jbr:"+uri;
 
