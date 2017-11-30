@@ -49,12 +49,14 @@ Using git: git clone https://github.com/TechnionTDK/jbs-classifier.git
 | UriConverter | converting hebrew source into a URI |
 | WikiPageParser | going over a source and finding all the sources in it |
 
-Compiling the project:
+## Compiling the project
 mvn clean package
 
 ## Usage
+
 java -cp target/jbs-classifier-1.0-SNAPSHOT-jar-with-dependencies.jar MainClass
  [--all|--file <path to file>|--help] [--dbg <debug flags>]
+
 
 Without any option (or only dbg flag) interactive mode will be used 
 and you will be prompt for the different options.
