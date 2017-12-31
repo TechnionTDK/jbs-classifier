@@ -1,4 +1,5 @@
 //import com.sun.deploy.util.BlackList;
+import edu.jhu.nlp.wikipedia.*;
 import org.apache.jena.atlas.lib.ListUtils;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -17,6 +18,9 @@ import java.util.Arrays;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.io.FileWriter;
+
+import static javafx.application.Platform.exit;
+
 /**
  * Created by eurocom on 12/05/2017.
  * WikiPageParser - main class to fetch wiki pages and parse them.
@@ -155,6 +159,23 @@ public class WikiPageParser {
         findMainBook();
         findCategories();
         getAllPageRef();
+    }
+
+    public static void main(String[] args) throws Exception {
+        WikiXMLParser wxsp = WikiXMLParserFactory.getSAXParser("C:\\Users\\netan\\Desktop\\jbs-classifier\\hewiki-20160203-pages-meta-history.xml.7z");
+        try {
+
+            wxsp.setPageCallback(new PageCallbackHandler() {
+                public void process(WikiPage page) {
+                    System.out.println(page.getWikiText());
+                }
+            });
+
+            wxsp.parse();
+        }catch(Exception e) {
+            e.printStackTrace();
+        }
+
     }
 }
 

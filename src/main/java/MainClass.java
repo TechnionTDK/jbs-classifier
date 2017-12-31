@@ -4,10 +4,12 @@
 import java.io.File;
 
 import java.util.ArrayList;
-
+import edu.jhu.nlp.wikipedia.*;
 import java.util.Scanner;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import static javafx.application.Platform.exit;
 
 /**
  * Created by eurocom on 27/06/2017.
@@ -20,6 +22,7 @@ public class MainClass {
 	static ArrayList<String> urls = new ArrayList<String>();
 
 	public static void main(String[] args) throws Exception {
+
 		String[] topics = {
 				"https://he.wikipedia.org/wiki/%D7%93%D7%95%D7%93_%D7%95%D7%91%D7%AA_%D7%A9%D7%91%D7%A2",
 				"https://he.wikipedia.org/wiki/%D7%AA%D7%9C%D7%9E%D7%95%D7%93_%D7%91%D7%91%D7%9C%D7%99"
