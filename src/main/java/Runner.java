@@ -3,8 +3,7 @@ import com.google.gson.GsonBuilder;
 
 import java.io.File;
 import java.io.FileWriter;
-import java.io.IOException;
-import java.util.LinkedList;
+
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Date;
