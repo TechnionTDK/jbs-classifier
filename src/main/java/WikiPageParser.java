@@ -55,7 +55,7 @@ public class WikiPageParser {
 	    int i=0;
 	    while (true)
         {
-            
+
             url = wikiPageURL;
             try {
                 org.jsoup.Connection conn = Jsoup.connect(URI.create(url).toASCIIString());
@@ -163,7 +163,7 @@ public class WikiPageParser {
     }
 
     public static void main(String[] args) throws Exception {
-        WikiXMLParser wxsp = WikiXMLParserFactory.getSAXParser("C:\\Users\\netan\\Desktop\\jbs-classifier\\hewiki-20160203-pages-meta-history.xml.7z");
+        WikiXMLParser wxsp = WikiXMLParserFactory.getSAXParser("C:\\Users\\netan\\Desktop\\jbs-classifier\\hewiki-20160203-pages-articles.xml");
         try {
 
             wxsp.setPageCallback(new PageCallbackHandler() {
