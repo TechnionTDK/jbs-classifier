@@ -55,6 +55,7 @@ public class WikiPageParser {
 	    int i=0;
 	    while (true)
         {
+            
             url = wikiPageURL;
             try {
                 org.jsoup.Connection conn = Jsoup.connect(URI.create(url).toASCIIString());
