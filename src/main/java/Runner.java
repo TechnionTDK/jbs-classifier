@@ -3,10 +3,15 @@ import com.google.gson.GsonBuilder;
 
 import java.io.File;
 import java.io.FileWriter;
-
+import java.io.IOException;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Date;
+import java.text.SimpleDateFormat;
+
+import info.bliki.wiki.dump.*;
+import info.bliki.wiki.model.WikiModel;
 
 //import StringUtils;
 
@@ -18,13 +23,15 @@ import java.util.Date;
 
 public class Runner implements Runnable {
     String url;
-    Profiler profiler;
+    Profiler profiler = new Profiler();
     int uriExist=0;
     static JsonList jList = new JsonList();
 
     WikiPageParser newWiki;
     JsonTuple jt;
-    static long ts=new Date().getTime();
+    static SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy.MM.dd_HH:mm:ss.SSS");
+    static String ts = dateFormat.format(new Date());
+    //static long ts=new Date().getTime();
     static String statDir="stats/"+ts+"/";
 
     /* stats file */
@@ -32,24 +39,37 @@ public class Runner implements Runnable {
     FileWriter pageRefs;
 
 
-    public Runner(String URL, Profiler prof) throws Exception {
+    public Runner(String URL) throws Exception {
         url = URL;
-        profiler = prof;
 
         new File(statDir).mkdirs();
         new File("outputs/").mkdirs();
-    }
 
-    public void run(){
         try {
             profiler.restartTimer();
             /* Fetching wiki page */
-            newWiki = new WikiPageParser(url);
+            newWiki = new WikiHtmlPageParser(url);
             profiler.sumRestartTimer(profiler.nFetchWiki, profiler.fetchWikiTotalTime);
         } catch (Exception e) {
             return;
         }
+    }
 
+    public Runner(WikiArticle page) throws Exception {
+        new File(statDir).mkdirs();
+        new File("outputs/").mkdirs();
+
+        try {
+            profiler.restartTimer();
+            /* Fetching wiki page */
+            newWiki = new WikiTextPageParser(page);
+            profiler.sumRestartTimer(profiler.nFetchWiki, profiler.fetchWikiTotalTime);
+        } catch (Exception e) {
+            return;
+        }
+    }
+
+    public void run(){
         try {
             /* Parsing wiki page */
             newWiki.WikiPageMain();
@@ -92,6 +112,7 @@ public class Runner implements Runnable {
         pageRefs.write(newWiki.pageTopic + ":\n");
         
         profiler.restartTimer();
+        UriConverter.nErrors=0;
         sourceList2URIs(newWiki.tanachRefs.sourceList, "");
         sourceList2URIs(newWiki.gmaraRefs.sourceList, "מסכת ");
         profiler.sumRestartTimer(profiler.numConverts, profiler.convUriTotalTime);

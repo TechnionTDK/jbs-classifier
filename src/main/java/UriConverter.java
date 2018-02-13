@@ -15,9 +15,10 @@ public class UriConverter {
                 "יא", "יב", "יג", "יד", "טו", "טז", "יז", "יח", "יט", "כ",
                 "כא", "כב", "כג", "כד", "כה", "כו", "כז", "כח", "כט", "ל",
         "לא", "לב", "לג", "לד", "לה", "לו", "לז", "לח", "לט", "מ"
-    }
-
-    ;
+    };
+    static int nErrors=0;
+    static int maxLegitErrors=10;
+    boolean xToEnd=false;
 
     public UriConverter(String source) {
         this.psukim = new ArrayList();
@@ -57,6 +58,10 @@ public class UriConverter {
         String start = data[0];
         String end = data[1];
 
+        if (end.equals(" ")){
+            xToEnd = true;
+        }
+
         boolean flag = false;
         for (String pasuk : this.psukimSet) {
             if (pasuk.equals(start)) {
@@ -81,11 +86,16 @@ public class UriConverter {
                 uri=uri.split("resource/")[1];
                 uri=uri.split(">")[0];
                 uri="jbr:"+uri;
-
-
-                this.uris.add(uri);}
-                catch (Exception e){
+                this.uris.add(uri);
+           } catch (Exception e){
+               if (xToEnd){
+                   Dbg.dbg(Dbg.URI.id,"המרת uri נכשלה, מניח שסוף פרק " + source);
+                    break;
+               }
                 Dbg.dbg(Dbg.ERROR.id,"המרת uri נכשלה " + source);
+                nErrors++;
+                if (nErrors == maxLegitErrors)
+                    Dbg.dbg(Dbg.ERROR.id,"Too many errors");
     /*
 		    try {
 		        FileWriter failRefs = new FileWriter("stat/fail_refs",true);

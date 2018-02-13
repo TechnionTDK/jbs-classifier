@@ -11,12 +11,12 @@ import java.util.List;
  */
 public class RefRegex {
 
-    static List<String> delim = Arrays.asList(",(( )?)", " ");
-    static List<String> suffix = Arrays.asList("$", ";", ",", "\\.", " ", "\\)");
+    static List<String> delim = Arrays.asList(",(( )?)", " ", "(\\|)(( )?)");
+    static List<String> suffix = Arrays.asList("$", ";", ",", "\\.", " ", "\\)","(\\|)",":");
 
     /* create range regex of location */
     static String locationRange(String location){
-        return "(" + "(( )?)-(( )?)" + location + ")?";
+        return "(" + "(( )?)(-|(\\|))(( )?)" + location + ")?";
     }
 
     /* create regex from list of strings
@@ -65,6 +65,7 @@ public class RefRegex {
      *      possible strings pre location 2,
      *      location 2
      */
+    /*
     static String refRegexInit(String books, List<String> booksBand, List<String> pref1, String loc1, List<String> pref2, String loc2){
         String buildRefRegex = books + "[\\']?";
         buildRefRegex += orList(delim);
@@ -75,6 +76,23 @@ public class RefRegex {
         buildRefRegex += optionalList(pref2);
         buildRefRegex += loc2;
         buildRefRegex += locationRange(loc2);
+        buildRefRegex += orList(suffix);
+        Dbg.dbg(Dbg.INFO.id,buildRefRegex);
+        return buildRefRegex;
+    }
+    */
+    static String refRegexInit(String books, List<String> booksBand, List<String> pref1, String loc1, List<String> pref2, String loc2){
+        String buildRefRegex = books + "[\\']?" + orList(delim);
+        if (booksBand!=null) buildRefRegex += bandList(booksBand);
+
+        String loc = optionalList(pref1) + loc1 + orList(delim);
+        loc += optionalList(pref2) + loc2;
+        //loc += locationRange(loc2);
+
+        buildRefRegex += loc;
+        buildRefRegex += orList(Arrays.asList(locationRange(loc),locationRange(loc2)));
+        //buildRefRegex += locationRange(loc);
+
         buildRefRegex += orList(suffix);
         Dbg.dbg(Dbg.INFO.id,buildRefRegex);
         return buildRefRegex;

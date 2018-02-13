@@ -1,4 +1,5 @@
 import java.util.List;
+import java.util.LinkedList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -27,4 +28,15 @@ public class StringUtils {
         return reference;
     }
 
+
+    public static List<String> insidePatern(String pref, String suff, String data) {
+        List<String> foundStrings = new LinkedList<String>();
+        Pattern pattern = Pattern.compile(pref + "(.*?)" + suff);
+        Matcher matcher = pattern.matcher(data);
+        while (matcher.find())
+        {
+            foundStrings.add(matcher.group(1));
+        }
+        return  foundStrings;
+    }
 }

@@ -32,12 +32,11 @@
             <artifactId>jena-arq</artifactId>
             <version>3.1.1</version>
         </dependency>
-        <dependency>
-            <groupId>edu.jhu.nlp</groupId>
-            <artifactId>wikixmlj</artifactId>
-            <version>1.0-SNAPSHOT</version>
-        </dependency>
-
+  	<dependency>
+    	    <groupId>info.bliki.wiki</groupId>
+    	    <artifactId>bliki-core</artifactId>
+    	    <version>3.1.0</version>
+  	</dependency>
     </dependencies>
    <build>
         <plugins>

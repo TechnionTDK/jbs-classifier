@@ -1,15 +1,18 @@
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 
-
+import info.bliki.wiki.dump.*;
+import info.bliki.wiki.model.WikiModel;
 
 import java.io.File;
-
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
-import edu.jhu.nlp.wikipedia.*;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.Scanner;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import static javafx.application.Platform.exit;
 
 /**
  * Created by eurocom on 27/06/2017.
@@ -18,11 +21,15 @@ public class MainClass {
 
 	static boolean multiThread = false;
 	static boolean allWiki = true;
+	static boolean LocalWiki = true;
 	static Scanner in = new Scanner(System.in);
 	static ArrayList<String> urls = new ArrayList<String>();
-
+	static String[] topics = {
+			"איליה קפיטולינה",
+			"הפטרה",
+			"יבוסים"
+	};
 	public static void main(String[] args) throws Exception {
-
 		String[] topics = {
 				"https://he.wikipedia.org/wiki/%D7%93%D7%95%D7%93_%D7%95%D7%91%D7%AA_%D7%A9%D7%91%D7%A2",
 				"https://he.wikipedia.org/wiki/%D7%AA%D7%9C%D7%9E%D7%95%D7%93_%D7%91%D7%91%D7%9C%D7%99"
@@ -69,12 +76,14 @@ public class MainClass {
 					System.out.println("\nNo debug flags, continue with defaults \n");
 					break;
 				}
+				int tmpflag = 0;
 				for(; i< args.length; i++) {
-					int tmpflag = 0;
+					System.out.println("try to set" + args[i]);
 					try {
 						tmpflag |= Dbg.valueOf(args[i]).id;
 						Dbg.enabledFlags = tmpflag;
 					} catch (Exception e) {
+						System.out.println("failed to set" + args[i]);
 						i--;
 						break;
 					}
@@ -289,7 +298,7 @@ public class MainClass {
    }
 
    static void processWikis(){
-	   if (allWiki == true) urls = new Queries().getAllWikipediaPages();
+
 	   //: new ArrayList<String>(Arrays.asList(topics));
 /*
 	   while (true) {
@@ -309,20 +318,49 @@ public class MainClass {
 		   }
 	   }
 */
-	   Profiler profiler = new Profiler();
-	   System.out.println("\n\nNumber of wikipedia pages: " + urls.size() + "\n\n");
-	   for(String url:urls) {
+
+	   if (LocalWiki && allWiki){
+		   String Filename = "hewiki-20160203-pages-articles.xml";
 		   try {
-			   if (multiThread)
-				   new Thread(new Runner(url, profiler)).start();
-			   else
-				   new Runner(url, profiler).run();
+			   IArticleFilter handler = new DumpArticleFilter();
+			   File f = new File(Filename);
+			   info.bliki.wiki.dump.WikiXMLParser wxp = new info.bliki.wiki.dump.WikiXMLParser(f,handler);
+			   wxp.parse();
 		   } catch (Exception e) {
-			   System.out.println("WE SHOULD NOT GET HERE!!!! \n" + url);
 			   e.printStackTrace();
+		   }
+	   }else {
+		   if (allWiki == true) urls = new Queries().getAllWikipediaPages();
+		   System.out.println("\n\nNumber of wikipedia pages: " + urls.size() + "\n\n");
+		   for (String url : urls) {
+			   try {
+				   if (multiThread)
+					   new Thread(new Runner(url)).start();
+				   else
+					   new Runner(url).run();
+			   } catch (Exception e) {
+				   System.out.println("WE SHOULD NOT GET HERE!!!! \n" + url);
+				   e.printStackTrace();
+			   }
 		   }
 	   }
 	   System.out.println("\n\nPage Scan finished. \nOutputs added to files with Timestamp " + Runner.ts + "\n\n");
    }
+
+
+	static class DumpArticleFilter implements IArticleFilter {
+		public void process(WikiArticle page, Siteinfo info) throws IOException {
+			try {
+				if (true || topics==null || topics.length == 0 || Arrays.asList(topics).contains(page.getTitle()) )
+					new Runner(page).run();
+			} catch (Exception e) {
+				System.out.println("WE SHOULD NOT GET HERE!!!! \n");
+				e.printStackTrace();
+			}
+			return;
+		}
+	}
 }
+
+
 

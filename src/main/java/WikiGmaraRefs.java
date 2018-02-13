@@ -2,6 +2,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.ListIterator;
 
 /* Inherit and relay on WikiBookRefs functionality.
  * supplying it relevant gmara regex and adding some extra unique formatting
@@ -13,7 +14,8 @@ public class WikiGmaraRefs extends WikiBookRefs {
     static List<String> sheetPrefix = Arrays.asList("עמוד", "עמודים");
     static List<String> pagePrefix = Arrays.asList("דפים", "דף");
     static String sheetRegxMin = "([א,ב])[\\']?";
-    static String sheetRegx = "(ע[\\\"])?" + "([א,ב])[\\']?";
+    //static String sheetRegx = "(ע[\\\"])?" + "([א,ב])[\\']?";
+    static String sheetRegx = "(ע([\\\"])?)?" + "([א,ב])[\\']?";
     static List<String> booksBand = Arrays.asList("");
 
     static List<String> gmaraBooksList = Arrays.asList(
@@ -74,12 +76,24 @@ public class WikiGmaraRefs extends WikiBookRefs {
         return gmaraBooks;
     }
 
-    /* remove ע standing from עמוד*/
-    String formateReference(String reference) {
-        reference = super.formateReference(reference);
-        String[] refSplit = reference.split(",");
-        refSplit[2] = refSplit[2].replaceAll("ע", "");
-        reference = refSplit[0] + "," + refSplit[1] + "," + refSplit[2];
-        return reference;
+    /* remove ע standing for עמוד*/
+    List<String> formateReference(String reference) {
+        List<String> refs = super.formateReference(reference);
+        for (int i = 0; i < refs.size(); i++)
+        {
+            String[] refSplit = refs.get(i).split(",");
+            refSplit[2] = refSplit[2].replaceAll("ע", "");
+            refs.set(i, refSplit[0] + "," + refSplit[1] + "," + refSplit[2]);
+        }
+        /*
+        for (ListIterator i = refs.listIterator(); i.hasNext(); )
+        {
+            String ref = i.next();
+            String[] refSplit = ref.split(",");
+            refSplit[2] = refSplit[2].replaceAll("ע", "");
+            i.set(refSplit[0] + "," + refSplit[1] + "," + refSplit[2]);
+        }
+        */
+        return refs;
     }
 }
