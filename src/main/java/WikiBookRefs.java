@@ -68,7 +68,15 @@ abstract public class WikiBookRefs {
             String from = bookSplit[1].split("-")[0].split("^,")[1];
             String to = bookSplit[1].split("-")[1];
             Dbg.dbg(Dbg.FOUND.id,"large range format: from:" + from + "to:" + to);
-            if (from.split(",")[0].equals(to.split(",")[0]) ){
+            if (!Arrays.asList(UriConverter.psukimSet).contains(to.split(",")[0])){
+                //mistakenly detected
+                bookSplit[1] = "," + from;
+                Dbg.dbg(Dbg.FOUND.id,"large range format: mistakenly detected, changing to: " + bookSplit[1]);
+            } else if (!Arrays.asList(UriConverter.psukimSet).contains(to.split(",")[1])){
+                //mistakenly detected, regular range
+                bookSplit[1] = "," + from  + "-" + to.split(",")[0];;
+                Dbg.dbg(Dbg.FOUND.id,"large range format: mistakenly detected, changing to regular range: " + bookSplit[1]);
+            } else if (from.split(",")[0].equals(to.split(",")[0]) ){
                 //same chapter
                 bookSplit[1] = "," + from + "-" + to.split(",")[1];
                 Dbg.dbg(Dbg.FOUND.id,"large range format: same chapter: " + bookSplit[1]);
@@ -119,40 +127,6 @@ abstract public class WikiBookRefs {
                 sourceList.add(source);
             }
          }
-    }
-
-    /* identify references in Wikipedia quot format (not in use)*/
-    void addQuoteSources(Document jsoupDoc){
-        for( Element quoteElement : jsoupDoc.select("blockquote")){
-            Matcher m = StringUtils.findRegInString(StringUtils.cleanString(quoteElement.text(),getBadWords()),getRefRegx());
-            addRefElement(m);
-        }
-    }
-
-    /* Identify references in Wikipedia ref format, looking in the title tag.
-     * Will add only references that are not identified as plain text.
-     */
-    void addTitleSources(Document jsoupDoc){
-        Element prevElement = new Element(Tag.valueOf("dummyValue"), "");
-        for( Element titleElement : jsoupDoc.select("[title~=s:"+ getRefRegx())){
-            if (titleElement.parent()==prevElement.parent())
-                continue;
-            prevElement=titleElement;
-
-            Matcher m = StringUtils.findRegInString(StringUtils.cleanString(titleElement.parent().text(),getBadWords()),getRefRegx());
-            if (m.find()) return;
-
-            m = StringUtils.findRegInString(StringUtils.cleanString(titleElement.attr("title"),getBadWords()),getRefRegx());
-            addRefElement(m);
-        }
-    }
-
-    /* Identify references in Wikipedia plain text. */
-    void addTextSources(Document jsoupDoc){
-        for( Element textElement : jsoupDoc.select("*:matchesOwn("+getRefRegx()+")")){
-            Matcher m = StringUtils.findRegInString(StringUtils.cleanString(textElement.text(),getBadWords()),getRefRegx());
-            addRefElement(m);
-        }
     }
 
     /* Identify references in Wikipedia plain text. */

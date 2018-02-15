@@ -22,8 +22,7 @@ import info.bliki.wiki.model.WikiModel;
  */
 
 public class Runner implements Runnable {
-    String url;
-    Profiler profiler = new Profiler();
+    static Profiler profiler = new Profiler();
     int uriExist=0;
     static JsonList jList = new JsonList();
 
@@ -39,22 +38,6 @@ public class Runner implements Runnable {
     FileWriter pageRefs;
 
 
-    public Runner(String URL) throws Exception {
-        url = URL;
-
-        new File(statDir).mkdirs();
-        new File("outputs/").mkdirs();
-
-        try {
-            profiler.restartTimer();
-            /* Fetching wiki page */
-            newWiki = new WikiHtmlPageParser(url);
-            profiler.sumRestartTimer(profiler.nFetchWiki, profiler.fetchWikiTotalTime);
-        } catch (Exception e) {
-            return;
-        }
-    }
-
     public Runner(WikiArticle page) throws Exception {
         new File(statDir).mkdirs();
         new File("outputs/").mkdirs();
@@ -62,7 +45,7 @@ public class Runner implements Runnable {
         try {
             profiler.restartTimer();
             /* Fetching wiki page */
-            newWiki = new WikiTextPageParser(page);
+            newWiki = new WikiPageParser(page);
             profiler.sumRestartTimer(profiler.nFetchWiki, profiler.fetchWikiTotalTime);
         } catch (Exception e) {
             return;
@@ -74,7 +57,7 @@ public class Runner implements Runnable {
             /* Parsing wiki page */
             newWiki.WikiPageMain();
             profiler.sumRestartTimer(profiler.nProcWikiPages, profiler.procWikiTotalTime);
-            jt = new JsonTuple(url, newWiki.pageTopic);
+            jt = new JsonTuple("", newWiki.pageTopic);
             FileWriter allPages = new FileWriter(statDir + "all_pages", true);
             allPages.write(newWiki.pageTopic + "\n");
             allPages.close();
@@ -93,7 +76,7 @@ public class Runner implements Runnable {
             writeJsonTuple(jt);
 
         } catch (Exception e) {
-	        System.out.println(url);
+	        System.out.println(newWiki.pageTopic);
             e.printStackTrace();
         }
     }

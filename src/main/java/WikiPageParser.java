@@ -26,11 +26,10 @@ import java.io.FileWriter;
  * parsing will find page topic, categories, main Tanach book if possible, and all Tanach\Gmara references.
  */
 
-abstract public class WikiPageParser {
+public class WikiPageParser {
 
-    int maxFetchTries = 0;
-    int triesInterval = 1;     //secs
-
+    WikiArticle wikiPage;
+    static String catRegex="\\[\\[" + "קטגוריה:" + "(.*?)" + "((\\|)|(\\]\\]))";
 
     List<String> categoriesList = new LinkedList<String>();
     String mainBook;
@@ -44,8 +43,15 @@ abstract public class WikiPageParser {
 
     /**************************************  topic + main book  ********************************************/
 
+    WikiPageParser(WikiArticle page) throws IOException, InterruptedException {
+        wikiPage=page;
+    }
+
     /* Set Wiki page topic */
-    abstract void getPageTopic();
+    void setPageTopic(){
+        pageTopic = wikiPage.getTitle();
+        Dbg.dbg(Dbg.ANY.id, "\nנושא: " + pageTopic);
+    }
 
     /*  Looking for main book in the Wiki pages categories section.
     *   First look for סיפורי ספר... if such doesn't exist will look for book name
@@ -54,22 +60,6 @@ abstract public class WikiPageParser {
         String costumeBookRegex = allBooks.replaceAll(" [א-ב]" + "\\)" , "( [א-ב]?)" + "\\)") + RefRegex.suffix;
         String costumeBookRegexStrict = "(" + "סיפורי ספר " + costumeBookRegex + ")";
 
-        /*
-        Elements bookElements = jsoupDoc.select(categoryPath + "[title~=" + "קטגוריה:" + costumeBookRegexStrict + "]");
-        if (bookElements.size() <= 0)
-            bookElements = jsoupDoc.select(categoryPath + "[title~=" + "קטגוריה:" + costumeBookRegex + "]");
-        if (bookElements.size() <= 0){
-            Dbg.dbg( Dbg.CAT.id, "page main book was not found");
-            mainBook = null;
-            return;
-        }
-
-        Matcher m = StringUtils.findRegInString(bookElements.first().text(),costumeBookRegex);
-        if (m.find()) {
-            mainBook = m.group(0);
-            Dbg.dbg(Dbg.PAGE.id | Dbg.CAT.id, "ספר:" + mainBook);
-        }
-        */
         for(String category : categoriesList){
             Matcher m = StringUtils.findRegInString(category,costumeBookRegexStrict);
             if (m.find()) {
@@ -95,17 +85,28 @@ abstract public class WikiPageParser {
     }
 
     /* Looking for Wiki page categories and add them to categoriesList*/
-    abstract void findCategories();
+    void findCategories(){
+        Matcher m = StringUtils.findRegInString(wikiPage.getText(),catRegex);
+        while (m.find())
+        {
+            Dbg.dbg(Dbg.CAT.id,"קטגוריה: " + m.group(1));
+            categoriesList.add(m.group(1));
+        }
+    }
 
     /* Look for references using WikiBookRefs class */
     void getAllPageRef(){
         tanachRefs = new WikiTanachRefs(mainBook);
         gmaraRefs = new WikiGmaraRefs(mainBook);
+        Dbg.dbg(Dbg.FOUND.id,"רפרנסים תנך מהטקסט");
+        tanachRefs.addTextSources(wikiPage);
+        Dbg.dbg(Dbg.FOUND.id,"רפרנסים גמרה מהטקסט");
+        gmaraRefs.addTextSources(wikiPage);
     }
 
 
     public void WikiPageMain() {
-        getPageTopic();
+        setPageTopic();
         findCategories();
         findMainBook();
         getAllPageRef();

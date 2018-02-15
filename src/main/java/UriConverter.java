@@ -10,7 +10,7 @@ public class UriConverter {
     ArrayList<String> uris;
     String sefer, perek;
     ArrayList<String> psukim;
-    String[] psukimSet=   {
+    static String[] psukimSet=   {
             "א", "ב", "ג", "ד", "ה", "ו", "ז", "ח", "ט", "י",
             "יא", "יב", "יג", "יד", "טו", "טז", "יז", "יח", "יט", "כ",
             "כא", "כב", "כג", "כד", "כה", "כו", "כז", "כח", "כט", "ל",
@@ -50,8 +50,8 @@ public class UriConverter {
         String[] data = this.source.split(",");
         this.sefer = data[0];
         this.sefer=this.sefer.replaceAll("תהלים","תהילים");
-        this.sefer=this.sefer.replaceAll("ירמיה","ירמיהו");
-        this.sefer=this.sefer.replaceAll("ישעיה","ישעיהו");
+        this.sefer=this.sefer.replaceAll("ירמיהו","ירמיה");
+        this.sefer=this.sefer.replaceAll("ישעיהו","ישעיה");
         this.perek = data[1];
         if (data.length == 3) {
             if (data[2].contains("-")) {

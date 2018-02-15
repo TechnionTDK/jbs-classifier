@@ -18,6 +18,9 @@ public class RefRegex {
     static String locationRange(String location){
         return "(" + "(( )?)(-|(\\|))(( )?)" + location + ")?";
     }
+    static String locationLargeRange(String location){
+        return "(" + "(( )?)(-)(( )?)" + location + ")?";
+    }
 
     /* create regex from list of strings
      * the strings are delimited by delim
@@ -90,7 +93,7 @@ public class RefRegex {
         //loc += locationRange(loc2);
 
         buildRefRegex += loc;
-        buildRefRegex += orList(Arrays.asList(locationRange(loc),locationRange(loc2)));
+        buildRefRegex += orList(Arrays.asList(locationLargeRange(loc),locationRange(loc2)));
         //buildRefRegex += locationRange(loc);
 
         buildRefRegex += orList(suffix);

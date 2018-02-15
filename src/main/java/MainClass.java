@@ -19,182 +19,22 @@ import java.util.regex.Pattern;
  */
 public class MainClass {
 
-	static boolean multiThread = false;
-	static boolean allWiki = true;
-	static boolean LocalWiki = true;
+	static boolean allWiki = false;
 	static Scanner in = new Scanner(System.in);
 	static ArrayList<String> urls = new ArrayList<String>();
 	static String[] topics = {
-			"איליה קפיטולינה",
+			"ספר שמואל",
 			"הפטרה",
 			"יבוסים"
 	};
 	public static void main(String[] args) throws Exception {
-		String[] topics = {
-				"https://he.wikipedia.org/wiki/%D7%93%D7%95%D7%93_%D7%95%D7%91%D7%AA_%D7%A9%D7%91%D7%A2",
-				"https://he.wikipedia.org/wiki/%D7%AA%D7%9C%D7%9E%D7%95%D7%93_%D7%91%D7%91%D7%9C%D7%99"
-		};
-
-		boolean procWiki = false;
-		for (int i=0; i < args.length ; i++) {
-			if (args[i].equals("--all") || args[i].equals("-a")) {
-				if (procWiki && !allWiki){
-					System.out.println("\nCannot scan all wikipedia and specific files at the same time\n");
-					usageMsg(false);
-					return;
-				}
-				allWiki = true;
-				procWiki = true;
-			} else if (args[i].equals("--help") ||  args[i].equals("-h")) {
-				usageMsg(true);
-				return;
-			} else if (args[i].equals("--file") ||  args[i].equals("-f")) {
-				if (procWiki && allWiki){
-					System.out.println("\nCannot scan all wikipedia and specific files at the same time\n");
-					usageMsg(false);
-					return;
-				}
-				if (++i >= args.length) {
-					System.out.println("\nNo file mentioned \n");
-					usageMsg(false);
-					return;
-				}
-				procWiki = false;
-				for(; i< args.length; i++) {
-					if (!urlsFromFile(args[i])) {
-						if (!procWiki) {
-							usageMsg(false);
-							return;
-						}
-						i--;
-						break;
-					}
-					procWiki = true;
-				}
-			} else if (args[i].equals("--dbg") || args[i].equals("-d")) {
-				if (++i >= args.length) {
-					System.out.println("\nNo debug flags, continue with defaults \n");
-					break;
-				}
-				int tmpflag = 0;
-				for(; i< args.length; i++) {
-					System.out.println("try to set" + args[i]);
-					try {
-						tmpflag |= Dbg.valueOf(args[i]).id;
-						Dbg.enabledFlags = tmpflag;
-					} catch (Exception e) {
-						System.out.println("failed to set" + args[i]);
-						i--;
-						break;
-					}
-				}
-			} else {
-				System.out.println("\n Unknown argument: " + args[i] + "\n");
-				usageMsg(false);
-				return;
-			}
-		}
-		if (procWiki) {
+		if (!parseArguments(args))
+			return;
+		if (allWiki || urls.size() > 0) {
 			processWikis();
 			return;
 		}
-
-
-		int optNum = 4;
-		while (true) {
-
-			WelcomeMsg();
-
-			int i;
-			while (true) {
-				System.out.print("\nPlease enter your choice [0-" + optNum + "]: ");
-				try {
-					i = Integer.parseInt(in.nextLine());
-					if (i >= 0 && i <= optNum)
-						break;
-					else
-						System.out.print(i + "is not a valid option");
-				} catch (NumberFormatException e) {
-					System.out.println("Not a number");
-				}
-			}
-
-
-			switch (i) {
-				case 0:
-					System.out.println("\nYou chose to exit (0) good bye\n");
-					return;
-				case 1:
-					System.out.println("\nYou chose to scan Wikipedia (1), scanning will start shortly\n\n\n");
-					allWiki = true;
-					processWikis();
-					break;
-				case 2:
-					System.out.println("\nYou chose to scan specific Wikipedia pages (2). " +
-							"Please enter URL. to finish enter 0:");
-					allWiki = false;
-					while (true) {
-						try {
-							String newURL = in.nextLine();
-							if (newURL.equals("0")) {
-								processWikis();
-								break;
-							}
-							urls.add(newURL);
-							System.out.println("\nURL was added. Please enter next URL or 0 to finish:");
-						} catch (Exception e) {
-							System.out.println("\nNot a valid string");
-						}
-					}
-					break;
-				case 3:
-					System.out.println("\nYou chose to scanning Wikipedia pages from file (3).");
-					while (true) {
-						System.out.println("\nPlease provide input file");
-						try {
-							String fileName = in.nextLine();
-							if (!urlsFromFile(fileName))
-								continue;
-							processWikis();
-							break;
-						} catch (Exception e) {
-							System.out.println("\nNot a char");
-						}
-					}
-					break;
-				case 4:
-					System.out.println("\nYou chose to manually classify specific topics (4).");
-					while (true) {
-						System.out.println("\nPlease enter new topic.\nto finish enter 0");
-						String newTopic;
-						try {
-							newTopic = in.nextLine();
-							if (newTopic.equals("0"))
-								break;
-						} catch (Exception e) {
-							System.out.println("\nNot a valid string");
-							continue;
-						}
-
-						JsonTuple jt = new JsonTuple("",newTopic);
-						addRefs(jt);
-						if (jt.mentions.isEmpty())
-							continue;
-
-						try {
-							System.out.println("\nAdding topic to outputs:" + newTopic);
-							Runner.writeJsonTuple(jt);
-						} catch (Exception e) {
-							System.out.println("\nWriting to file failed, please try again");
-							e.printStackTrace();
-						}
-					}
-					break;
-			}
-			System.out.println("\nPlease press any key to continue\n");
-			in.nextLine();
-			urls = new ArrayList<String>();
-		}
+		getInputAndProcess();
 	}
 
 	static void WelcomeMsg() {
@@ -251,6 +91,134 @@ public class MainClass {
 		System.out.println("profiler                      	Run time information of each phase\n\n");
 	}
 
+	static boolean parseArguments(String[] args) throws Exception {
+		boolean procWiki = false;
+		for (int i=0; i < args.length ; i++) {
+			if (args[i].equals("--all") || args[i].equals("-a")) {
+				if (procWiki && !allWiki){
+					System.out.println("\nCannot scan all wikipedia and specific files at the same time\n");
+					usageMsg(false);
+					return false;
+				}
+				allWiki = true;
+				procWiki = true;
+			} else if (args[i].equals("--help") ||  args[i].equals("-h")) {
+				usageMsg(true);
+				return false;
+			} else if (args[i].equals("--file") ||  args[i].equals("-f")) {
+				if (procWiki && allWiki){
+					System.out.println("\nCannot scan all wikipedia and specific files at the same time\n");
+					usageMsg(false);
+					return false;
+				}
+				if (++i >= args.length) {
+					System.out.println("\nNo file mentioned \n");
+					usageMsg(false);
+					return false;
+				}
+				procWiki = false;
+				for(; i< args.length; i++) {
+					if (!urlsFromFile(args[i])) {
+						if (!procWiki) {
+							usageMsg(false);
+							return false;
+						}
+						i--;
+						break;
+					}
+					procWiki = true;
+				}
+			} else if (args[i].equals("--dbg") || args[i].equals("-d")) {
+				if (++i >= args.length) {
+					System.out.println("\nNo debug flags, continue with defaults \n");
+					break;
+				}
+				int tmpflag = 0;
+				for(; i< args.length; i++) {
+					try {
+						tmpflag |= Dbg.valueOf(args[i]).id;
+						Dbg.enabledFlags = tmpflag;
+					} catch (Exception e) {
+						System.out.println("failed to set" + args[i]);
+						i--;
+						break;
+					}
+				}
+			} else {
+				System.out.println("\n Unknown argument: " + args[i] + "\n");
+				usageMsg(false);
+				return false;
+			}
+		}
+		return true;
+	}
+
+	static void getInputAndProcess(){
+		int optNum = 4;
+		while (true){
+			WelcomeMsg();
+			int i;
+			while (true) {
+				System.out.print("\nPlease enter your choice [0-" + optNum + "]: ");
+				try {
+					i = Integer.parseInt(in.nextLine());
+					if (i >= 0 && i <= optNum)
+						break;
+					else
+						System.out.print(i + "is not a valid option");
+				} catch (NumberFormatException e) {
+					System.out.println("Not a number");
+				}
+			}
+			switch (i) {
+				case 0:
+					System.out.println("\nYou chose to exit (0) good bye\n");
+					return;
+				case 1:
+					System.out.println("\nYou chose to scan Wikipedia (1), scanning will start shortly\n\n\n");
+					allWiki = true;
+					processWikis();
+					break;
+				case 2:
+					System.out.println("\nYou chose to scan specific Wikipedia pages (2). " +
+							"Please enter URL. to finish enter 0:");
+					allWiki = false;
+					while (true) {
+						try {
+							String newURL = in.nextLine();
+							if (newURL.equals("0")) {
+								processWikis();
+								break;
+							}
+							urls.add(newURL);
+							System.out.println("\nURL was added. Please enter next URL or 0 to finish:");
+						} catch (Exception e) {
+							System.out.println("\nNot a valid string");
+						}
+					}
+					break;
+				case 3:
+					System.out.println("\nYou chose to scanning Wikipedia pages from file (3).");
+					while (true) {
+						System.out.println("\nPlease provide input file");
+						try {
+							String fileName = in.nextLine();
+							if (!urlsFromFile(fileName))
+								continue;
+							processWikis();
+							break;
+						} catch (Exception e) {
+							System.out.println("\nNot a char");
+						}
+					}
+					break;
+			}
+			System.out.println("\nPlease press any key to continue\n");
+			in.nextLine();
+			urls = new ArrayList<String>();
+		}
+	}
+
 	static boolean urlsFromFile(String fileName) throws Exception{
 		File file = new File(fileName);
 		if (!file.exists()) {
@@ -267,82 +235,16 @@ public class MainClass {
 		return true;
 	}
 
-   static void addRefs(JsonTuple jt) {
-       String sheetRegx = "([א,ב])[\\']?";
-       String validTanachReg = "^" + WikiTanachRefs.tanachBooks + "," + WikiBookRefs.location + "," + WikiBookRefs.location + RefRegex.locationRange(WikiBookRefs.location) + "$";
-       String validGmaraReg = "^" + WikiGmaraRefs.gmaraBooks + "," + WikiBookRefs.location + "," + sheetRegx + RefRegex.locationRange(sheetRegx) + "$";
-
-	   while(true) {
-		   try {
-			   System.out.println("Please add reference in the following formats: \n" +
-					   "<book>,<perek>,<pasuk>[-<pasuk>] or <masechet>,<amud>,<daf>[-<daf>] \nto finish enter \"0\" ");
-			   String ref = in.nextLine();
-			   if (ref.equals("0"))
-				   return;
-			   Pattern tanachPattern = Pattern.compile(validTanachReg);
-			   Matcher tanachMatcher = tanachPattern.matcher(ref);
-			   Pattern gmaraPattern = Pattern.compile(validGmaraReg);
-			   Matcher gmraMatcher = gmaraPattern.matcher(ref);
-			   if (tanachMatcher.find() || gmraMatcher.find()) {
-				   ArrayList<String> uris = new UriConverter(ref).getUris();
-				   if (!uris.isEmpty()) {
-					   jt.setMentions(uris);
-					   System.out.println("Reference added");
-				   }
-			   } else
-			   		System.out.println("Reference bad format, please try again");
-		   } catch (Exception e) {
-			   System.out.println("Not a valid string");
-		   }
-	   }
-   }
 
    static void processWikis(){
-
-	   //: new ArrayList<String>(Arrays.asList(topics));
-/*
-	   while (true) {
-		   System.out.print("Do you wish to run in multi-thread (no stats)? [y,n] ");
-		   try {
-			   char c = (char) System.in.read();
-			   if (c=='y' || c=='Y' ) {
-				   multiThread = true;
-				   break;
-			   }else if (c=='n' || c=='N'){
-				   multiThread = false;
-				   break;
-			   }
-			   System.out.print(c + "is not a valid option");
-		   } catch (Exception e) {
-			   System.out.println("Not a char");
-		   }
-	   }
-*/
-
-	   if (LocalWiki && allWiki){
-		   String Filename = "hewiki-20160203-pages-articles.xml";
-		   try {
-			   IArticleFilter handler = new DumpArticleFilter();
-			   File f = new File(Filename);
-			   info.bliki.wiki.dump.WikiXMLParser wxp = new info.bliki.wiki.dump.WikiXMLParser(f,handler);
-			   wxp.parse();
-		   } catch (Exception e) {
-			   e.printStackTrace();
-		   }
-	   }else {
-		   if (allWiki == true) urls = new Queries().getAllWikipediaPages();
-		   System.out.println("\n\nNumber of wikipedia pages: " + urls.size() + "\n\n");
-		   for (String url : urls) {
-			   try {
-				   if (multiThread)
-					   new Thread(new Runner(url)).start();
-				   else
-					   new Runner(url).run();
-			   } catch (Exception e) {
-				   System.out.println("WE SHOULD NOT GET HERE!!!! \n" + url);
-				   e.printStackTrace();
-			   }
-		   }
+	   String Filename = "hewiki-20160203-pages-articles.xml";
+	   try {
+		   IArticleFilter handler = new DumpArticleFilter();
+		   File f = new File(Filename);
+		   info.bliki.wiki.dump.WikiXMLParser wxp = new info.bliki.wiki.dump.WikiXMLParser(f,handler);
+		   wxp.parse();
+	   } catch (Exception e) {
+		   e.printStackTrace();
 	   }
 	   System.out.println("\n\nPage Scan finished. \nOutputs added to files with Timestamp " + Runner.ts + "\n\n");
    }
@@ -351,7 +253,7 @@ public class MainClass {
 	static class DumpArticleFilter implements IArticleFilter {
 		public void process(WikiArticle page, Siteinfo info) throws IOException {
 			try {
-				if (true || topics==null || topics.length == 0 || Arrays.asList(topics).contains(page.getTitle()) )
+				if (topics==null || topics.length == 0 || Arrays.asList(topics).contains(page.getTitle()) )
 					new Runner(page).run();
 			} catch (Exception e) {
 				System.out.println("WE SHOULD NOT GET HERE!!!! \n");
