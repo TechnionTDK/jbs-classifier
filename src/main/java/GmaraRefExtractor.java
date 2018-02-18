@@ -7,7 +7,7 @@ import java.util.ListIterator;
 /* Inherit and relay on WikiBookRefs functionality.
  * supplying it relevant gmara regex and adding some extra unique formatting
  */
-public class WikiGmaraRefs extends WikiBookRefs {
+public class GmaraRefExtractor extends RefExtractor {
 
     protected static List<String> badWords = Arrays.asList("דפים","עמודים","עמוד","דף");
 
@@ -61,15 +61,12 @@ public class WikiGmaraRefs extends WikiBookRefs {
     protected static String gmaraBooks = RefRegex.booksInit(gmaraBooksList);
     protected static String gmaraRefRegex = RefRegex.refRegexInit(gmaraBooks, null, pagePrefix, location, sheetPrefix, sheetRegx);
 
-
-    WikiGmaraRefs(String book){
-        super(book);
-    }
+    public GmaraRefExtractor() { }
 
     protected List<String> getBadWords() {
         return badWords;
     }
-    protected String getRefRegx(){
+    protected String getRegularExpression(){
         return gmaraRefRegex;
     }
     public String getBooks(){
@@ -85,15 +82,6 @@ public class WikiGmaraRefs extends WikiBookRefs {
             refSplit[2] = refSplit[2].replaceAll("ע", "");
             refs.set(i, refSplit[0] + "," + refSplit[1] + "," + refSplit[2]);
         }
-        /*
-        for (ListIterator i = refs.listIterator(); i.hasNext(); )
-        {
-            String ref = i.next();
-            String[] refSplit = ref.split(",");
-            refSplit[2] = refSplit[2].replaceAll("ע", "");
-            i.set(refSplit[0] + "," + refSplit[1] + "," + refSplit[2]);
-        }
-        */
         return refs;
     }
 }

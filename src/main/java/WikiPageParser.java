@@ -29,16 +29,15 @@ import java.io.FileWriter;
 public class WikiPageParser {
 
     WikiArticle wikiPage;
-    static String catRegex="\\[\\[" + "קטגוריה:" + "(.*?)" + "((\\|)|(\\]\\]))";
 
     List<String> categoriesList = new LinkedList<String>();
     String mainBook;
     String pageTopic;
 
-    WikiTanachRefs tanachRefs;
-    WikiGmaraRefs gmaraRefs;
+    List<Source> tanachRefs=new LinkedList<Source>();
+    List<Source> gmaraRefs=new LinkedList<Source>();
 
-    static String allBooks = "(" + RefRegex.booksInit(WikiTanachRefs.tanachBooksList) + "|" + RefRegex.booksInit(WikiGmaraRefs.gmaraBooksList) + ")";
+    static String allBooks = "(" + RefRegex.booksInit(TanachRefExtractor.tanachBooksList) + "|" + RefRegex.booksInit(GmaraRefExtractor.gmaraBooksList) + ")";
 
 
     /**************************************  topic + main book  ********************************************/
@@ -86,22 +85,19 @@ public class WikiPageParser {
 
     /* Looking for Wiki page categories and add them to categoriesList*/
     void findCategories(){
-        Matcher m = StringUtils.findRegInString(wikiPage.getText(),catRegex);
-        while (m.find())
-        {
-            Dbg.dbg(Dbg.CAT.id,"קטגוריה: " + m.group(1));
-            categoriesList.add(m.group(1));
-        }
+        categoriesList.addAll(new CategoriesExtractor().extract(wikiPage.getText()));
     }
 
     /* Look for references using WikiBookRefs class */
     void getAllPageRef(){
-        tanachRefs = new WikiTanachRefs(mainBook);
-        gmaraRefs = new WikiGmaraRefs(mainBook);
+
         Dbg.dbg(Dbg.FOUND.id,"רפרנסים תנך מהטקסט");
-        tanachRefs.addTextSources(wikiPage);
+        for (String ref : new TanachRefExtractor().extract(wikiPage.getText()))
+            tanachRefs.add(new Source(ref, mainBook));
+
         Dbg.dbg(Dbg.FOUND.id,"רפרנסים גמרה מהטקסט");
-        gmaraRefs.addTextSources(wikiPage);
+        for (String ref : new GmaraRefExtractor().extract(wikiPage.getText()))
+            gmaraRefs.add(new Source(ref, mainBook));
     }
 
 

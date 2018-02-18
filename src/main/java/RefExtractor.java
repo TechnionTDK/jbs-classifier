@@ -20,20 +20,15 @@ import static com.sun.org.apache.xalan.internal.xsltc.compiler.util.Type.String;
  * references will be saved in 'sourceList'
  */
 
-abstract public class WikiBookRefs {
-    String mainBook;
-    List<Source> sourceList=new LinkedList<Source>();
+abstract public class RefExtractor extends Extractor {
     static String location = "([א-ת&&[^ץ,^ף,^ן,^ך,^ם]][\\\"]?){1,3}[\\']?";
     static List<String> badWords = Arrays.asList("\\\'", "\\\"", "\\.", ";", "\\)", "\\(");
     static List<String> ignoredWords = Arrays.asList("\\{", "\\}", "\\\'");
 
-    WikiBookRefs(String book){
-        mainBook = book;
-    }
 
     /* Getters functions to relay on static inheritance class regex */
     abstract protected List<String> getBadWords();
-    abstract protected String getRefRegx();
+    abstract protected String getRegularExpression();
     public abstract String getBooks();
 
 
@@ -112,28 +107,19 @@ abstract public class WikiBookRefs {
     }
 
     /* For each found reference in the matcher will clean badWords, format and add to sourceList. */
-    void addRefElement(Matcher m){
-        while (m.find())
-        {
-            String reference = m.group(0);
-            Dbg.dbg(Dbg.FOUND.id, reference +" (raw)" );
-            reference = StringUtils.cleanString(reference,badWords);
-            List<String> refs= formateReference(reference);
-            for (String ref : refs) {
-                if (ref.split(",").length <= 2)
-                    continue;
-                Dbg.dbg(Dbg.FOUND.id, ref + " (clean)");
-                Source source = new Source(ref, mainBook);
-                sourceList.add(source);
-            }
-         }
+    public List<String> normalize(Matcher m){
+        String reference = m.group(0);
+        Dbg.dbg(Dbg.FOUND.id, reference +" (raw)" );
+        reference = StringUtils.cleanString(reference,badWords);
+        List<String> refs= formateReference(reference);
+        for (String ref : refs) {
+            Dbg.dbg(Dbg.FOUND.id, ref + " (clean)");
+        }
+        return refs;
     }
-
-    /* Identify references in Wikipedia plain text. */
-    void addTextSources(WikiArticle page){
-        //System.out.println(StringUtils.cleanString(page.getText(),new ArrayList<String>(ignoredWords){{ addAll(getBadWords());}}));
-        Matcher m = StringUtils.findRegInString(StringUtils.cleanString(page.getText(),new ArrayList<String>(ignoredWords){{ addAll(getBadWords());}}), getRefRegx());
-            addRefElement(m);
+    
+    protected String cleanText(String text){
+        return StringUtils.cleanString(text,new ArrayList<String>(ignoredWords){{ addAll(getBadWords()); }});
     }
 }
 
