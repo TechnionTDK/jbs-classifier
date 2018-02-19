@@ -20,8 +20,10 @@ public class JsonList {
         JsonTuple jt=new JsonTuple();
         FileWriter writer;
         jt.setUri("https://he.wikipedia.org/wiki/עקידת_יצחק");
-        jt.addMention("jbr:tanach-1-12-1");
-        jt.addMention("jbr:tanach-1-12-2");
+        MentionsTuple mt1 = new MentionsTuple("jbr:tanach-1-12-1", "CONTEXT");
+        MentionsTuple mt2 = new MentionsTuple("jbr:tanach-1-12-2", "CONTEXT");
+        jt.addMention(mt1);
+        jt.addMention(mt2);
         JsonList list=new JsonList();
         list.addJsonTuple(jt);
         list.addJsonTuple(jt);

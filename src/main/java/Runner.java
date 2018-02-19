@@ -123,7 +123,13 @@ public class Runner implements Runnable {
                     Dbg.dbg(Dbg.URI.id, uri);
                     pagesUri.write(uri + "\n");
                 }
-                jt.setMentions(uris);
+                ArrayList<MentionsTuple> mts = new ArrayList<MentionsTuple>();
+                for(int i=0; i<uris.size(); i++){
+                    MentionsTuple mentionsTuple = new MentionsTuple();
+                    mentionsTuple.setPasuk(uris.get(i));
+                    mentionsTuple.setContext("");//TODO: add real context here!
+                }
+                jt.setMentions(mts);
             } catch (Exception e) { System.out.println(e);}
         }
     }
