@@ -92,12 +92,16 @@ public class WikiPageParser {
     void getAllPageRef(){
 
         Dbg.dbg(Dbg.FOUND.id,"רפרנסים תנך מהטקסט");
-        for (String ref : new TanachRefExtractor().extract(wikiPage.getText()))
-            tanachRefs.add(new Source(ref, mainBook));
+        for (String paragraph : new ParagraphExtractor(TanachRefExtractor.tanachRefRegex).extract(wikiPage.getText())) {
+            for (String ref : new TanachRefExtractor().extract(paragraph))
+                tanachRefs.add(new Source(ref, paragraph, mainBook));
+        }
 
         Dbg.dbg(Dbg.FOUND.id,"רפרנסים גמרה מהטקסט");
-        for (String ref : new GmaraRefExtractor().extract(wikiPage.getText()))
-            gmaraRefs.add(new Source(ref, mainBook));
+        for (String paragraph : new ParagraphExtractor(GmaraRefExtractor.gmaraRefRegex).extract(wikiPage.getText())) {
+            for (String ref : new GmaraRefExtractor().extract(paragraph))
+                gmaraRefs.add(new Source(ref, paragraph, mainBook));
+        }
     }
 
 

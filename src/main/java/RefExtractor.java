@@ -23,7 +23,7 @@ import static com.sun.org.apache.xalan.internal.xsltc.compiler.util.Type.String;
 abstract public class RefExtractor extends Extractor {
     static String location = "([א-ת&&[^ץ,^ף,^ן,^ך,^ם]][\\\"]?){1,3}[\\']?";
     static List<String> badWords = Arrays.asList("\\\'", "\\\"", "\\.", ";", "\\)", "\\(");
-    static List<String> ignoredWords = Arrays.asList("\\{", "\\}", "\\\'");
+    static List<String> ignoredWords = Arrays.asList("\\{", "\\}", "\\\'", "\\[", "\\]");
 
 
     /* Getters functions to relay on static inheritance class regex */
@@ -119,7 +119,6 @@ abstract public class RefExtractor extends Extractor {
     }
 
     protected String cleanText(String text){
-        System.out.println(StringUtils.cleanString(text,new ArrayList<String>(ignoredWords){{ addAll(getBadWords()); }}));
         return StringUtils.cleanString(text,new ArrayList<String>(ignoredWords){{ addAll(getBadWords()); }});
     }
 }

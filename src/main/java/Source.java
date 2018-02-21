@@ -12,11 +12,13 @@ public class Source {
     String from;
     String to;
     boolean matchBook = false;
+    String paragraph;
 
-    Source(String reference, String mainbook){
+    Source(String reference, String refParagraph, String mainbook){
         if (mainbook!=null && reference.startsWith(mainbook))
             matchBook = true;
         fullRef = reference;
+        paragraph = refParagraph;
 
         String[] refSplit = reference.split(",");
         book = refSplit[0];
