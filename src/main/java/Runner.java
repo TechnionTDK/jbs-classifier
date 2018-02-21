@@ -119,15 +119,12 @@ public class Runner implements Runnable {
                     uriPages.close();
                     pagesUri.write(newWiki.pageTopic + ":\n");
                 }
+                ArrayList<MentionsTuple> mts = new ArrayList<MentionsTuple>();
                 for (String uri : uris) {
                     Dbg.dbg(Dbg.URI.id, uri);
                     pagesUri.write(uri + "\n");
-                }
-                ArrayList<MentionsTuple> mts = new ArrayList<MentionsTuple>();
-                for(int i=0; i<uris.size(); i++){
-                    MentionsTuple mentionsTuple = new MentionsTuple();
-                    mentionsTuple.setPasuk(uris.get(i));
-                    mentionsTuple.setContext("");//TODO: add real context here!
+                    MentionsTuple mentionsTuple = new MentionsTuple(uri, ""); //TODO: add real context here!
+                    mts.add(mentionsTuple);
                 }
                 jt.setMentions(mts);
             } catch (Exception e) { System.out.println(e);}

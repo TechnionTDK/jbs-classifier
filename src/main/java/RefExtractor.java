@@ -117,8 +117,9 @@ abstract public class RefExtractor extends Extractor {
         }
         return refs;
     }
-    
+
     protected String cleanText(String text){
+        System.out.println(StringUtils.cleanString(text,new ArrayList<String>(ignoredWords){{ addAll(getBadWords()); }}));
         return StringUtils.cleanString(text,new ArrayList<String>(ignoredWords){{ addAll(getBadWords()); }});
     }
 }

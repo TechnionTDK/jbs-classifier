@@ -12,7 +12,7 @@ import java.util.List;
 public class RefRegex {
 
     static List<String> delim = Arrays.asList(",(( )?)", " ", "(\\|)(( )?)");
-    static List<String> suffix = Arrays.asList("$", ";", ",", "\\.", " ", "\\)","(\\|)",":");
+    static List<String> suffix = Arrays.asList("$", ";", ",", "\\.", " ", "\\)","(\\|)",":","\\n");
 
     /* create range regex of location */
     static String locationRange(String location){
