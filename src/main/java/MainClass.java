@@ -1,18 +1,10 @@
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-
 import info.bliki.wiki.dump.*;
-import info.bliki.wiki.model.WikiModel;
 
 import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.Scanner;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /**
  * Created by eurocom on 27/06/2017.
@@ -21,7 +13,7 @@ public class MainClass {
 
 	static boolean allWiki = false;
 	static Scanner in = new Scanner(System.in);
-	static ArrayList<String> urls = new ArrayList<String>();
+	static ArrayList<String> titles = new ArrayList<String>();
 	static String[] topics = {
 			"ספר שמואל",
 			"הפטרה",
@@ -30,7 +22,7 @@ public class MainClass {
 	public static void main(String[] args) throws Exception {
 		if (!parseArguments(args))
 			return;
-		if (allWiki || urls.size() > 0) {
+		if (allWiki || titles.size() > 0) {
 			processWikis();
 			return;
 		}
@@ -118,7 +110,7 @@ public class MainClass {
 				}
 				procWiki = false;
 				for(; i< args.length; i++) {
-					if (!urlsFromFile(args[i])) {
+					if (!readTitlesFromFile(args[i])) {
 						if (!procWiki) {
 							usageMsg(false);
 							return false;
@@ -190,7 +182,7 @@ public class MainClass {
 								processWikis();
 								break;
 							}
-							urls.add(newURL);
+							titles.add(newURL);
 							System.out.println("\nURL was added. Please enter next URL or 0 to finish:");
 						} catch (Exception e) {
 							System.out.println("\nNot a valid string");
@@ -203,7 +195,7 @@ public class MainClass {
 						System.out.println("\nPlease provide input file");
 						try {
 							String fileName = in.nextLine();
-							if (!urlsFromFile(fileName))
+							if (!readTitlesFromFile(fileName))
 								continue;
 							processWikis();
 							break;
@@ -215,11 +207,11 @@ public class MainClass {
 			}
 			System.out.println("\nPlease press any key to continue\n");
 			in.nextLine();
-			urls = new ArrayList<String>();
+			titles = new ArrayList<String>();
 		}
 	}
 
-	static boolean urlsFromFile(String fileName) throws Exception{
+	static boolean readTitlesFromFile(String fileName) throws Exception{
 		File file = new File(fileName);
 		if (!file.exists()) {
 			System.out.println("\nFile " + fileName + " does not exist");
@@ -227,8 +219,8 @@ public class MainClass {
 		}
 		Scanner inFile = new Scanner(file);
 		while (inFile.hasNext()) {
-			String newURL = inFile.nextLine();
-			urls.add(newURL);
+			String newTitle = inFile.nextLine();
+			titles.add(newTitle);
 		}
 		inFile.close();
 		allWiki = false;

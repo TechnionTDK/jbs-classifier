@@ -8,11 +8,11 @@ public abstract class Extractor {
     List<String> extract(String text){
         String regExp = getRegularExpression();
         Matcher m = applyRegularExpression(cleanText(text),regExp);
-        List<String> finalResaults = new LinkedList<String>();
+        List<String> finalResults = new LinkedList<String>();
         while (m.find()){
-            finalResaults.addAll(normalize(m));
+            finalResults.addAll(normalize(m));
         }
-        return finalResaults;
+        return finalResults;
     }
 
     abstract protected String getRegularExpression();
