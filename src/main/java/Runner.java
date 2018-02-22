@@ -3,15 +3,12 @@ import com.google.gson.GsonBuilder;
 
 import java.io.File;
 import java.io.FileWriter;
-import java.io.IOException;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Date;
 import java.text.SimpleDateFormat;
 
 import info.bliki.wiki.dump.*;
-import info.bliki.wiki.model.WikiModel;
 
 //import StringUtils;
 
@@ -55,11 +52,11 @@ public class Runner implements Runnable {
     public void run(){
         try {
             /* Parsing wiki page */
-            newWiki.WikiPageMain();
+            newWiki.parsePage();
             profiler.sumRestartTimer(profiler.nProcWikiPages, profiler.procWikiTotalTime);
-            jt = new JsonTuple("", newWiki.pageTopic);
+            jt = new JsonTuple("", newWiki.pageTitle);
             FileWriter allPages = new FileWriter(statDir + "all_pages", true);
-            allPages.write(newWiki.pageTopic + "\n");
+            allPages.write(newWiki.pageTitle + "\n");
             allPages.close();
 
             /* Converting found reference to URIs and adding to JsonTuple */
@@ -72,11 +69,11 @@ public class Runner implements Runnable {
 	            return;
 
             /* write JsonTuple to json file */
-            Dbg.dbg(Dbg.FINAL.id | Dbg.PAGE.id, "מוסיף נושא:  " + newWiki.pageTopic + "\n");
+            Dbg.dbg(Dbg.FINAL.id | Dbg.PAGE.id, "מוסיף נושא:  " + newWiki.pageTitle + "\n");
             writeJsonTuple(jt);
 
         } catch (Exception e) {
-	        System.out.println(newWiki.pageTopic);
+	        System.out.println(newWiki.pageTitle);
             e.printStackTrace();
         }
     }
@@ -87,12 +84,12 @@ public class Runner implements Runnable {
             return;
 
         FileWriter refsPages = new FileWriter(statDir + "pages_with_refs", true);
-        refsPages.write(newWiki.pageTopic + "\n");
+        refsPages.write(newWiki.pageTitle + "\n");
         refsPages.close();
 
         pageRefs = new FileWriter(statDir + "pages_refs", true);
         pagesUri = new FileWriter(statDir + "pages_uri", true);
-        pageRefs.write(newWiki.pageTopic + ":\n");
+        pageRefs.write(newWiki.pageTitle + ":\n");
         
         profiler.restartTimer();
         UriConverter.nErrors=0;
@@ -105,25 +102,25 @@ public class Runner implements Runnable {
     }
 
 
-    public void sourceList2URIs(List<Source> sourceList, String refPref) throws Exception {
-        for(Source source : sourceList){
-            source.fullRef= refPref + source.fullRef;
-            Dbg.dbg(Dbg.FINAL.id, source.fullRef);
-            pageRefs.write(source.fullRef + "\n");
+    public void sourceList2URIs(List<Reference> referenceList, String refPref) throws Exception {
+        for(Reference reference : referenceList){
+            reference.fullRef= refPref + reference.fullRef;
+            Dbg.dbg(Dbg.FINAL.id, reference.fullRef);
+            pageRefs.write(reference.fullRef + "\n");
             try {
-                ArrayList<String> uris = new UriConverter(source.fullRef).getUris();
+                ArrayList<String> uris = new UriConverter(reference.fullRef).getUris();
                 if(!uris.isEmpty() && uriExist==0){
                     uriExist=1;
                     FileWriter uriPages = new FileWriter(statDir + "pages_with_uri", true);
-                    uriPages.write(newWiki.pageTopic + "\n");
+                    uriPages.write(newWiki.pageTitle + "\n");
                     uriPages.close();
-                    pagesUri.write(newWiki.pageTopic + ":\n");
+                    pagesUri.write(newWiki.pageTitle + ":\n");
                 }
                 ArrayList<MentionsTuple> mts = new ArrayList<MentionsTuple>();
                 for (String uri : uris) {
                     Dbg.dbg(Dbg.URI.id, uri);
                     pagesUri.write(uri + "\n");
-                    MentionsTuple mentionsTuple = new MentionsTuple(uri, source.paragraph); //TODO: add real context here!
+                    MentionsTuple mentionsTuple = new MentionsTuple(uri, reference.paragraph); //TODO: add real context here!
                     mts.add(mentionsTuple);
                 }
                 jt.setMentions(mts);

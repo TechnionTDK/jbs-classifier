@@ -12,7 +12,7 @@ Now we can mark each URI as related to the topic it was mentioned in.
 ## Example
 ![](https://user-images.githubusercontent.com/23153327/32541137-6868d552-c477-11e7-9b0e-0ffc1077a6dd.png)
 
-we will get the following list for the marked source:<br />
+we will get the following list for the marked reference:<br />
 jbr:text-tanach-1-22-1<br />
 jbr:text-tanach-1-22-2<br />
 jbr:text-tanach-1-22-3<br />
@@ -46,8 +46,8 @@ Using git: git clone https://github.com/TechnionTDK/jbs-classifier.git
 | Queries | all the SPARQL queries are executed here |
 | RefRegex | generic class in order to be able to create regular expressions |
 | Runner | writing the results to the output file |
-| UriConverter | converting hebrew source into a URI |
-| WikiPageParser | going over a source and finding all the sources in it |
+| UriConverter | converting hebrew reference into a URI |
+| WikiPageParser | going over a reference and finding all the sources in it |
 
 ## Compiling the project
 mvn clean package
