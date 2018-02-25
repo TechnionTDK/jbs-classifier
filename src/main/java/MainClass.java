@@ -29,59 +29,6 @@ public class MainClass {
 		getInputAndProcess();
 	}
 
-	static void WelcomeMsg() {
-		System.out.print("\033[H\033[2J");
-		System.out.flush();
-		System.out.println("***********************************************");
-		System.out.println("**         Welcome to jbs-classifier         **");
-		System.out.println("***********************************************");
-		System.out.println("\nPlease choose one of the following actions:\n");
-		System.out.println("1. Scan Wikipedia");
-		System.out.println("2. Scan specific Wikipedia pages");
-		System.out.println("3. Scan specific Wikipedia pages from file");
-		System.out.println("4. Manually add classifications");
-		System.out.println("\n0. To exit");
-	}
-
-	static void usageMsg(boolean fullMsg) {
-
-		System.out.println("\nOptions: [--all|--file <path to file>|--help] [--dbg <debug flags>]\n");
-		if(!fullMsg){
-			System.out.println("To see full usage please run with --help/-h\n\n");
-			return;
-		}
-		System.out.println("Without any option (or only dbg flag) interactive mode will be used.\n");
-
-		System.out.println("-a, --all                       Start Wikipedia full scan (scan all pages).\n" +
-				  		   "                                This option cannot be combined with -f/--file.");
-		System.out.println("-f, --file <files>              Scan specific Wikipedia pages.\n" +
-						   "                                Pages URLs should be provided in the added files\n" +
-						   "                                This option cannot be combined with -a/--all");
-		System.out.println("-h, --help                      Print this message");
-		System.out.println("-d, --dbg <debug flags>         Specify which debug flags to enable.");
-		System.out.println("                                PAGE and ERROR are enabled by default.");
-		System.out.println("                                Following debug flags are available:");
-		System.out.println("                                NONE  - Disable debug messages.");
-		System.out.println("                                ERROR - Show failure messages.");
-		System.out.println("                                INFO  - General information on the program status.");
-		System.out.println("                                PAGE  - General information on a parsed wiki page.");
-		System.out.println("                                CAT   - Information on page categories.");
-		System.out.println("                                FOUND - Potential references as found in parsed wiki page.");
-		System.out.println("                                FINAL - References found in parsed wiki page in final format.");
-		System.out.println("                                URI   - References URI found in parsed wiki page.");
-		System.out.println("                                ANY   - Enable all debug messages.\n");
-
-		System.out.println("Scan output is written to outputs/<timestamp>.json\n");
-
-		System.out.println("Further information is available under 'stat_<timestamp>' \nin the following files:");
-		System.out.println("all_pages                       All parsed pages");
-		System.out.println("pages_with_refs                 Pages with potential references");
-		System.out.println("pages_refs                      Potential references by page");
-		System.out.println("pages_with_uri                  Pages with references");
-		System.out.println("pages_uri                       URIs by page");
-		System.out.println("error_pages                     Un-parsable pages");
-		System.out.println("profiler                      	Run time information of each phase\n\n");
-	}
 
 	static boolean parseArguments(String[] args) throws Exception {
 		boolean procWiki = false;
@@ -89,30 +36,25 @@ public class MainClass {
 			if (args[i].equals("--all") || args[i].equals("-a")) {
 				if (procWiki && !allWiki){
 					System.out.println("\nCannot scan all wikipedia and specific files at the same time\n");
-					usageMsg(false);
 					return false;
 				}
 				allWiki = true;
 				procWiki = true;
 			} else if (args[i].equals("--help") ||  args[i].equals("-h")) {
-				usageMsg(true);
 				return false;
 			} else if (args[i].equals("--file") ||  args[i].equals("-f")) {
 				if (procWiki && allWiki){
 					System.out.println("\nCannot scan all wikipedia and specific files at the same time\n");
-					usageMsg(false);
 					return false;
 				}
 				if (++i >= args.length) {
 					System.out.println("\nNo file mentioned \n");
-					usageMsg(false);
 					return false;
 				}
 				procWiki = false;
 				for(; i< args.length; i++) {
 					if (!readTitlesFromFile(args[i])) {
 						if (!procWiki) {
-							usageMsg(false);
 							return false;
 						}
 						i--;
@@ -138,7 +80,6 @@ public class MainClass {
 				}
 			} else {
 				System.out.println("\n Unknown argument: " + args[i] + "\n");
-				usageMsg(false);
 				return false;
 			}
 		}
@@ -148,7 +89,6 @@ public class MainClass {
 	static void getInputAndProcess(){
 		int optNum = 4;
 		while (true){
-			WelcomeMsg();
 			int i;
 			while (true) {
 				System.out.print("\nPlease enter your choice [0-" + optNum + "]: ");
@@ -170,24 +110,6 @@ public class MainClass {
 					System.out.println("\nYou chose to scan Wikipedia (1), scanning will start shortly\n\n\n");
 					allWiki = true;
 					processWikis();
-					break;
-				case 2:
-					System.out.println("\nYou chose to scan specific Wikipedia pages (2). " +
-							"Please enter URL. to finish enter 0:");
-					allWiki = false;
-					while (true) {
-						try {
-							String newURL = in.nextLine();
-							if (newURL.equals("0")) {
-								processWikis();
-								break;
-							}
-							titles.add(newURL);
-							System.out.println("\nURL was added. Please enter next URL or 0 to finish:");
-						} catch (Exception e) {
-							System.out.println("\nNot a valid string");
-						}
-					}
 					break;
 				case 3:
 					System.out.println("\nYou chose to scanning Wikipedia pages from file (3).");
