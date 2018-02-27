@@ -69,31 +69,28 @@ public class MainClass {
 			return false;
 		}
 
-		switch(args[0]) {
-			case "--all":
-			case "-a":
-				allWiki = true;
-				break;
-			case "--help":
-			case "-h":
-				usageMsg(true, null);
+		if (args[0].equals("--all") || args[0].equals("-a")) {
+			allWiki = true;
+		}
+		else if (args[0].equals("--help") || args[0].equals("-h")) {
+			usageMsg(true, null);
+			return false;
+		}
+		else if (args[0].equals("--file") || args[0].equals("-f")) {
+			allWiki = false;
+			if (args.length <= currArg) {
+				usageMsg(false, "\nNo file mentioned \n");
 				return false;
-			case "-f":
-			case "--file":
-				allWiki = false;
-				if (args.length <= currArg) {
-					usageMsg(false, "\nNo file mentioned \n");
-					return false;
-				}
-				if (!readTitlesFromFile(args[currArg])) {
-					usageMsg(false, null);
-					return false;
-				}
-				currArg++;
-				break;
-			default:
-				usageMsg(false, "\nUnknown argument: " + args[0] + "\n");
+			}
+			if (!readTitlesFromFile(args[currArg])) {
+				usageMsg(false, null);
 				return false;
+			}
+			currArg++;
+		}
+		else {
+			usageMsg(false, "\nUnknown argument: " + args[0] + "\n");
+			return false;
 		}
 
 		if (args.length <= currArg)
