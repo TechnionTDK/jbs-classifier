@@ -25,7 +25,7 @@ public class Runner implements Runnable {
 
     WikiPageParser newWiki;
     JsonTuple jt;
-    static SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy.MM.dd_HH:mm:ss.SSS");
+    static SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy.MM.dd_HH.mm.ss.SSS");
     static String ts = dateFormat.format(new Date());
     //static long ts=new Date().getTime();
     static String statDir="stats/"+ts+"/";

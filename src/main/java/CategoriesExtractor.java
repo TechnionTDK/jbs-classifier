@@ -13,6 +13,7 @@ public class CategoriesExtractor extends Extractor {
     }
 
     public List<String> normalize(Matcher m){
+        Dbg.dbg(Dbg.CAT.id, "קטגוריה: " + m.group(1));
         return Arrays.asList(m.group(1));
     }
 }
