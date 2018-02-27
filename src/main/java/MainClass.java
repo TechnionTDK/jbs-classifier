@@ -14,11 +14,6 @@ public class MainClass {
 	static boolean allWiki = false;
 	static Scanner in = new Scanner(System.in);
 	static ArrayList<String> titles = new ArrayList<String>();
-	static String[] topics = {
-			"ספר שמואל",
-			"הפטרה",
-			"יבוסים"
-	};
 
 	public static void main(String[] args) throws Exception {
 		if (!readArguments(args))
