@@ -54,12 +54,17 @@ mvn clean package
 
 ## Usage
 
+Since we want to improve our preformance, we are using the Hebrew Wikipeia dump.
+In order to run the program, you need to downloaded the dumpfile from [here](https://archive.org/details/hewiki-20160203).
+Click on Download options -> GZIP -> show all -> hewiki-20160203-pages-articles.xml.bz2.
+Then, extract the file and put it in the root folder of the project - jbs-classifier.
+
+There are 2 running modes: working with all wkikpedia pages or aorking with specific pages given in as input in a file.
+
+Running:
 java -cp target/jbs-classifier-1.0-SNAPSHOT-jar-with-dependencies.jar MainClass
  [--all|--file <path to file>|--help] [--dbg <debug flags>]
 
-
-Without any option (or only dbg flag) interactive mode will be used 
-and you will be prompt for the different options.
 
 Scan output is written to outputs/timestamp.json
 
@@ -79,5 +84,3 @@ pages_uri - URIs by page
 error_pages - Un-parsable pages
 
 profiler - Run time information of each phase
-
-Full usage is available by running the program with --help flag.
