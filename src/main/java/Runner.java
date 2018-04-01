@@ -22,7 +22,7 @@ public class Runner implements Runnable {
     static Profiler profiler = new Profiler();
     int uriExist=0;
     static JsonList jList = new JsonList();
-
+    String pageId;
     WikiPageParser newWiki;
     JsonTuple jt;
     static SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy.MM.dd_HH.mm.ss.SSS");
@@ -36,9 +36,10 @@ public class Runner implements Runnable {
 
 
     public Runner(WikiArticle page) throws Exception {
+
         new File(statDir).mkdirs();
         new File("outputs/").mkdirs();
-
+        this.pageId = page.getId();
         try {
             profiler.restartTimer();
             /* Fetching wiki page */
@@ -54,7 +55,7 @@ public class Runner implements Runnable {
             /* Parsing wiki page */
             newWiki.parsePage();
             profiler.sumRestartTimer(profiler.nProcWikiPages, profiler.procWikiTotalTime);
-            jt = new JsonTuple("", newWiki.pageTitle);
+            jt = new JsonTuple("http://en.wikipedia.org/?curid=" + pageId, newWiki.pageTitle);
             FileWriter allPages = new FileWriter(statDir + "all_pages", true);
             allPages.write(newWiki.pageTitle + "\n");
             allPages.close();
