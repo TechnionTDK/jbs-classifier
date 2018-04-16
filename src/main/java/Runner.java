@@ -62,6 +62,7 @@ public class Runner implements Runnable {
 
             /* Converting found reference to URIs and adding to JsonTuple */
             handelSourceLists();
+            profiler.sumRestartTimer(profiler.numConverts, profiler.convUriTotalTime);
 
             /* writing updated profiler information to file */
             writeProfiler();
@@ -72,6 +73,7 @@ public class Runner implements Runnable {
             /* write JsonTuple to json file */
             Dbg.dbg(Dbg.FINAL.id | Dbg.PAGE.id, "מוסיף נושא:  " + newWiki.pageTitle + "\n");
             writeJsonTuple(jt);
+            profiler.sumRestartTimer(profiler.numFileWrite, profiler.writeToFileTime);
 
         } catch (Exception e) {
 	        System.out.println(newWiki.pageTitle);
@@ -96,7 +98,6 @@ public class Runner implements Runnable {
         UriConverter.nErrors=0;
         sourceList2URIs(newWiki.tanachRefs, "");
         sourceList2URIs(newWiki.gmaraRefs, "מסכת ");
-        profiler.sumRestartTimer(profiler.numConverts, profiler.convUriTotalTime);
 
         pagesUri.close();
         pageRefs.close();

@@ -36,6 +36,9 @@ public class Profiler {
     MutableLong convUriTotalTime = new MutableLong(0);
     MutableInt numConverts = new MutableInt(0);
 
+    MutableLong writeToFileTime = new MutableLong(0);
+    MutableInt numFileWrite = new MutableInt(0);
+
     long otherTotalTime = 0;
 
 
