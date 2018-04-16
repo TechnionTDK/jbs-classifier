@@ -139,6 +139,7 @@ public class Runner implements Runnable {
         sumTimers += profiler.fetchWikiParagraphsTime.longValue();
         sumTimers += profiler.fetchWikiRefTime.longValue();
         sumTimers += profiler.procWikiRefTime.longValue();
+        sumTimers += profiler.writeToFileTime.longValue();
 
         long totTime = new Date().getTime() - profiler.startRunTime;
         FileWriter profilerFile = new FileWriter(statDir + "profiler", false);
@@ -162,6 +163,9 @@ public class Runner implements Runnable {
 
                 "\n\nconvert time: " + profiler.convUriTotalTime.longValue() +
                 "\nconverted pages: " + profiler.numConverts.intValue() +
+
+                "\n\nwrite to file time: " + profiler.writeToFileTime.longValue() +
+                "\nwritings to file: " + profiler.numFileWrite.intValue() +
 
                 "\n\nrest of the time: " + profiler.otherTotalTime +
                 "\n\ntimers sum: " + sumTimers + "\ntotal time: " + totTime);
