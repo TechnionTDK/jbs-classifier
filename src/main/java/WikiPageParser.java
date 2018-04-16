@@ -45,17 +45,29 @@ public class WikiPageParser {
 
     /* Look for references using WikiBookRefs class */
     void findReferences(){
-
         Dbg.dbg(Dbg.FOUND.id,"רפרנסים תנך מהטקסט");
-        for (String paragraph : new ParagraphExtractor(TanachRefExtractor.tanachRefRegex).extract(wikiPage.getText())) {
-            for (String ref : new TanachRefExtractor().extract(paragraph))
+        String[] paragraphs = wikiPage.getText().split("[\n]");
+        //List<String> paragraphs = new ParagraphExtractor(TanachRefExtractor.tanachRefRegex).extract(wikiPage.getText());
+        Runner.profiler.sumRestartTimer(Runner.profiler.nFetchWikiParagraphs, Runner.profiler.fetchWikiParagraphsTime);
+
+        for (String paragraph : paragraphs) {
+            List<String> refs = new TanachRefExtractor().extract(paragraph);
+            Runner.profiler.sumRestartTimer(Runner.profiler.nFetchWikiRefs, Runner.profiler.fetchWikiRefTime);
+            for (String ref : refs)
                 tanachRefs.add(new Reference(ref, paragraph));
+            Runner.profiler.sumRestartTimer(Runner.profiler.nProcWikiRefs, Runner.profiler.procWikiRefTime);
         }
 
         Dbg.dbg(Dbg.FOUND.id,"רפרנסים גמרה מהטקסט");
-        for (String paragraph : new ParagraphExtractor(GmaraRefExtractor.gmaraRefRegex).extract(wikiPage.getText())) {
-            for (String ref : new GmaraRefExtractor().extract(paragraph))
+        //paragraphs = new ParagraphExtractor(GmaraRefExtractor.gmaraRefRegex).extract(wikiPage.getText());
+        //Runner.profiler.sumRestartTimer(Runner.profiler.nFetchWikiParagraphs, Runner.profiler.fetchWikiParagraphsTime);
+
+        for (String paragraph : paragraphs) {
+            List<String> refs = new GmaraRefExtractor().extract(paragraph);
+            Runner.profiler.sumRestartTimer(Runner.profiler.nFetchWikiRefs, Runner.profiler.fetchWikiRefTime);
+            for (String ref : refs )
                 gmaraRefs.add(new Reference(ref, paragraph));
+            Runner.profiler.sumRestartTimer(Runner.profiler.nProcWikiRefs, Runner.profiler.procWikiRefTime);
         }
     }
 
@@ -63,6 +75,7 @@ public class WikiPageParser {
     public void parsePage() {
         setPageTitle();
         findCategories();
+        Runner.profiler.sumRestartTimer(Runner.profiler.nProcWikiTiltles, Runner.profiler.procWikiTitleTime);
         findReferences();
     }
 }

@@ -18,8 +18,20 @@ public class Profiler {
     MutableLong fetchWikiTotalTime = new MutableLong(0);
     MutableInt nFetchWiki = new MutableInt(0);
 
+    MutableLong procWikiTitleTime = new MutableLong(0);
+    MutableInt nProcWikiTiltles = new MutableInt(0);
+
     MutableLong procWikiTotalTime = new MutableLong(0);
     MutableInt nProcWikiPages = new MutableInt(0);
+
+    MutableLong fetchWikiParagraphsTime = new MutableLong(0);
+    MutableInt nFetchWikiParagraphs = new MutableInt(0);
+
+    MutableLong fetchWikiRefTime = new MutableLong(0);
+    MutableInt nFetchWikiRefs = new MutableInt(0);
+
+    MutableLong procWikiRefTime = new MutableLong(0);
+    MutableInt nProcWikiRefs = new MutableInt(0);
 
     MutableLong convUriTotalTime = new MutableLong(0);
     MutableInt numConverts = new MutableInt(0);

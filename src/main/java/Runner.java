@@ -133,14 +133,34 @@ public class Runner implements Runnable {
         sumTimers += profiler.procWikiTotalTime.longValue();
         sumTimers += profiler.fetchWikiTotalTime.longValue();
         sumTimers += profiler.convUriTotalTime.longValue();
+        sumTimers += profiler.procWikiTitleTime.longValue();
+        sumTimers += profiler.fetchWikiParagraphsTime.longValue();
+        sumTimers += profiler.fetchWikiRefTime.longValue();
+        sumTimers += profiler.procWikiRefTime.longValue();
+
         long totTime = new Date().getTime() - profiler.startRunTime;
         FileWriter profilerFile = new FileWriter(statDir + "profiler", false);
         profilerFile.write("fetch wiki time: " + profiler.fetchWikiTotalTime.longValue() +
                 "\nfetched wikis: " + profiler.nFetchWiki.intValue() +
+
                 "\n\nprocess time: " + profiler.procWikiTotalTime.longValue() +
                 "\nprocessed pages: " + profiler.nProcWikiPages.intValue() +
+
+                "\n\nfetch title: " + profiler.procWikiTitleTime.longValue() +
+                "\ntitles fetched: " + profiler.nProcWikiTiltles.intValue() +
+
+                "\n\nfetch paragraphs time: " + profiler.fetchWikiParagraphsTime.longValue() +
+                "\nparagraph fetches: " + profiler.nFetchWikiParagraphs.intValue() +
+
+                "\n\nfetch Refs time: " + profiler.fetchWikiRefTime.longValue() +
+                "\nrefs fetches: " + profiler.nFetchWikiRefs.intValue() +
+
+                "\n\nprocess refs time: " + profiler.procWikiRefTime.longValue() +
+                "\nrefs processes: " + profiler.nProcWikiRefs.intValue() +
+
                 "\n\nconvert time: " + profiler.convUriTotalTime.longValue() +
                 "\nconverted pages: " + profiler.numConverts.intValue() +
+
                 "\n\nrest of the time: " + profiler.otherTotalTime +
                 "\n\ntimers sum: " + sumTimers + "\ntotal time: " + totTime);
         profilerFile.close();
