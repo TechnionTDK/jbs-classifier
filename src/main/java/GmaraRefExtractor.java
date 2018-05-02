@@ -8,7 +8,8 @@ import java.util.ListIterator;
  * supplying it relevant gmara regex and adding some extra unique formatting
  */
 public class GmaraRefExtractor extends RefExtractor {
-
+    String parserName="גמרא";
+    static String refPref = "מסכת ";
     protected static List<String> badWords = Arrays.asList("דפים","עמודים","עמוד","דף");
 
     static List<String> sheetPrefix = Arrays.asList("עמוד", "עמודים");
@@ -63,6 +64,12 @@ public class GmaraRefExtractor extends RefExtractor {
 
     public GmaraRefExtractor() { }
 
+    protected String getParserName() {
+        return parserName;
+    }
+    protected String getRefPref() {
+        return refPref;
+    }
     protected List<String> getBadWords() {
         return badWords;
     }

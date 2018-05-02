@@ -19,18 +19,21 @@ import static com.sun.org.apache.xalan.internal.xsltc.compiler.util.Type.String;
  * class relay on regex provided by it's inheritance classes
  * references will be saved in 'sourceList'
  */
-
 abstract public class RefExtractor extends Extractor {
+    /* strings to filter etc. global to all parsers*/
     static String location = "([א-ת&&[^ץ,^ף,^ן,^ך,^ם]][\\\"]?){1,3}[\\']?";
     static List<String> badWords = Arrays.asList("\\\'", "\\\"", "\\.", ";", "\\)", "\\(");
     static List<String> ignoredWords = Arrays.asList("\\{", "\\}", "\\\'", "\\[", "\\]");
 
+    /*list to hold all found refferences by the parser*/
+    List<Reference> parserRefs=new LinkedList<Reference>();
 
     /* Getters functions to relay on static inheritance class regex */
     abstract protected List<String> getBadWords();
     abstract protected String getRegularExpression();
+    abstract protected String getParserName();
+    abstract protected String getRefPref();
     public abstract String getBooks();
-
 
     /* format the reference by cleaning/adding extra white spaces and comma */
     List<String> formateReference(String reference) {

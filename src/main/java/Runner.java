@@ -83,8 +83,14 @@ public class Runner implements Runnable {
 
 
     public void handelSourceLists() throws Exception {
-        if (newWiki.tanachRefs.isEmpty() && newWiki.gmaraRefs.isEmpty())
-            return;
+        boolean noRefs =  true;
+        for (RefExtractor parser : newWiki.parsers){
+            if (!parser.parserRefs.isEmpty()){
+                noRefs = false;
+                break;
+            }
+        }
+        if (noRefs) return;
 
         FileWriter refsPages = new FileWriter(statDir + "pages_with_refs", true);
         refsPages.write(newWiki.pageTitle + "\n");
@@ -96,8 +102,9 @@ public class Runner implements Runnable {
         
         profiler.restartTimer();
         UriConverter.nErrors=0;
-        sourceList2URIs(newWiki.tanachRefs, "");
-        sourceList2URIs(newWiki.gmaraRefs, "מסכת ");
+
+        for (RefExtractor parser : newWiki.parsers)
+            sourceList2URIs(parser.parserRefs, parser.getRefPref());
 
         pagesUri.close();
         pageRefs.close();
@@ -129,6 +136,7 @@ public class Runner implements Runnable {
             } catch (Exception e) { System.out.println(e);}
         }
     }
+
 
     void writeProfiler() throws Exception {
         long sumTimers = profiler.otherTotalTime;

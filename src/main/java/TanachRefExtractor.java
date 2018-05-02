@@ -7,6 +7,8 @@ import java.util.List;
  */
 public class TanachRefExtractor extends RefExtractor {
 
+    static String parserName = "תנ\"ך";
+    static String refPref = "";
     protected static List<String> badWords = Arrays.asList( "פסוקים", "פסוק", "ספר", "פרק" );
 
 
@@ -63,6 +65,14 @@ public class TanachRefExtractor extends RefExtractor {
 
 
     public TanachRefExtractor() {}
+
+    protected String getParserName() {
+        return parserName;
+    }
+
+    protected  String getRefPref(){
+        return refPref;
+    }
 
     protected List<String> getBadWords() {
         return badWords;
