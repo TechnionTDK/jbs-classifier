@@ -1,5 +1,7 @@
 import java.lang.reflect.Array;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
 
 /*
@@ -41,19 +43,26 @@ public class RefRegex {
     static String bandList(List<String> list){
         return regexFromList(list, "|", "", "","?!", "");
     }
-
     static String optionalNoSpaceList(List<String> list){
         return regexFromList(list, "|", "", "","", "?");
     }
-
     static String optionalList(List<String> list){
         return regexFromList(list, "|", "", " ","", "?");
     }
-
     static String orList(List<String> list){
         return regexFromList(list, "|", "", "","", "");
     }
 
+    static List<String> mergeSubList (List<String> majors, List<List<String>> minorsArray, List<String> pref){
+        List<String> mergedList = new ArrayList<>();
+        int majorIndex = 0;
+        for (String major : majors){
+            String minorRegEx = orList(minorsArray.get(majorIndex));
+            mergedList.add(major + orList(delim) + optionalList(pref) + minorRegEx);
+            majorIndex++;
+        }
+        return mergedList;
+    }
 
     static String booksInit(List<String> booksList){
         return orList(booksList);
@@ -68,22 +77,7 @@ public class RefRegex {
      *      possible strings pre location 2,
      *      location 2
      */
-    /*
-    static String refRegexInit(String books, List<String> booksBand, List<String> pref1, String loc1, List<String> pref2, String loc2){
-        String buildRefRegex = books + "[\\']?";
-        buildRefRegex += orList(delim);
-        if (booksBand!=null) buildRefRegex += bandList(booksBand);
-        buildRefRegex += optionalList(pref1);
-        buildRefRegex += loc1;
-        buildRefRegex += orList(delim);
-        buildRefRegex += optionalList(pref2);
-        buildRefRegex += loc2;
-        buildRefRegex += locationRange(loc2);
-        buildRefRegex += orList(suffix);
-        Dbg.dbg(Dbg.INFO.id,buildRefRegex);
-        return buildRefRegex;
-    }
-    */
+
     static String refRegexInit(String books, List<String> booksBand, List<String> pref1, String loc1, List<String> pref2, String loc2){
         String buildRefRegex = books + "[\\']?" + orList(delim);
         if (booksBand!=null) buildRefRegex += bandList(booksBand);

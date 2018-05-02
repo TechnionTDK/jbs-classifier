@@ -33,6 +33,7 @@ public class WikiPageParser {
         /*registering parsers*/
         parsers.add(new TanachRefExtractor());
         parsers.add(new GmaraRefExtractor());
+        parsers.add(new RambamRefExtractor());
     }
 
     /* Set Wiki page topic */
@@ -63,30 +64,6 @@ public class WikiPageParser {
                 Runner.profiler.sumRestartTimer(Runner.profiler.nProcWikiRefs, Runner.profiler.procWikiRefTime);
             }
         }
-
-
-        /*
-        Dbg.dbg(Dbg.FOUND.id,"רפרנסים תנך מהטקסט");
-        for (String paragraph : paragraphs) {
-            List<String> refs = new TanachRefExtractor().extract(paragraph);
-            Runner.profiler.sumRestartTimer(Runner.profiler.nFetchWikiRefs, Runner.profiler.fetchWikiRefTime);
-            for (String ref : refs)
-                tanachRefs.add(new Reference(ref, paragraph));
-            Runner.profiler.sumRestartTimer(Runner.profiler.nProcWikiRefs, Runner.profiler.procWikiRefTime);
-        }
-
-        Dbg.dbg(Dbg.FOUND.id,"רפרנסים גמרה מהטקסט");
-        //paragraphs = new ParagraphExtractor(GmaraRefExtractor.gmaraRefRegex).extract(wikiPage.getText());
-        //Runner.profiler.sumRestartTimer(Runner.profiler.nFetchWikiParagraphs, Runner.profiler.fetchWikiParagraphsTime);
-
-        for (String paragraph : paragraphs) {
-            List<String> refs = new GmaraRefExtractor().extract(paragraph);
-            Runner.profiler.sumRestartTimer(Runner.profiler.nFetchWikiRefs, Runner.profiler.fetchWikiRefTime);
-            for (String ref : refs )
-                gmaraRefs.add(new Reference(ref, paragraph));
-            Runner.profiler.sumRestartTimer(Runner.profiler.nProcWikiRefs, Runner.profiler.procWikiRefTime);
-        }
-        */
     }
 
 
