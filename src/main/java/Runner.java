@@ -129,7 +129,7 @@ public class Runner implements Runnable {
                 for (String uri : uris) {
                     Dbg.dbg(Dbg.URI.id, uri);
                     pagesUri.write(uri + "\n");
-                    MentionsTuple mentionsTuple = new MentionsTuple(uri, reference.paragraph); //TODO: add real context here!
+                    MentionsTuple mentionsTuple = new MentionsTuple(uri, reference.paragraph, reference.fullRef);
                     mts.add(mentionsTuple);
                 }
                 jt.setMentions(mts);

@@ -116,13 +116,7 @@ public class UriConverter {
                 nErrors++;
                 if (nErrors == maxLegitErrors)
                     Dbg.dbg(Dbg.ERROR.id,"Too many errors");
-    /*
-		    try {
-		        FileWriter failRefs = new FileWriter("stat/fail_refs",true);
-		        failRefs.write(this.sefer+" "+this.perek+" "+pasuk+"\n");
-		        failRefs.close();
-		    } catch (Exception ee) {}
-	*/
+
            }
         }
 

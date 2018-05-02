@@ -6,6 +6,16 @@ public class MentionsTuple {
     private String pasuk;
     private String context;
 
+    public String getLabel() {
+        return label;
+    }
+
+    public void setLabel(String label) {
+        this.label = label;
+    }
+
+    private String label;
+
     public MentionsTuple(){
     }
 
@@ -25,8 +35,9 @@ public class MentionsTuple {
         this.context = context;
     }
 
-    public MentionsTuple(String pasuk, String context){
+    public MentionsTuple(String pasuk, String context, String label){
         this.pasuk=pasuk;
         this.context=context;
+        this.label = label;
     }
 }
