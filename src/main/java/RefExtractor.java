@@ -25,15 +25,16 @@ abstract public class RefExtractor extends Extractor {
     static List<String> badWords = Arrays.asList("\\\'", "\\\"", "\\.", ";", "\\)", "\\(");
     static List<String> ignoredWords = Arrays.asList("\\{", "\\}", "\\\'", "\\[", "\\]");
 
-    /*list to hold all found refferences by the parser*/
+    /*list to hold all found references by the parser*/
     List<Reference> parserRefs=new LinkedList<Reference>();
 
     /* Getters functions to relay on static inheritance class regex */
-    abstract protected List<String> getBadWords();
-    abstract protected String getRegularExpression();
-    abstract protected String getParserName();
-    abstract protected String getRefPref();
-    public abstract String getBooks();
+    abstract protected ParserData getParserData();
+
+    protected String getRegularExpression(){
+        return getParserData().refRegex;
+    }
+
 
     /* format the reference by cleaning/adding extra white spaces and comma */
     List<String> formateReference(String reference) {
@@ -56,7 +57,7 @@ abstract public class RefExtractor extends Extractor {
         reference = reference.replaceAll("([\\s]*),([\\s]*)", ",");
 
         //replace space delimiter with ','
-        String[] bookSplit = reference.split("(?<=" + getBooks() + ")");
+        String[] bookSplit = reference.split("(?<=" + getParserData().booksRegex + ")");
         bookSplit[1] = bookSplit[1].replaceAll("[\\s]+", ",");
         bookSplit[1] = bookSplit[1].replaceAll("(?i),,", ",");
 
@@ -122,7 +123,7 @@ abstract public class RefExtractor extends Extractor {
     }
 
     protected String cleanText(String text){
-        return StringUtils.cleanString(text,new ArrayList<String>(ignoredWords){{ addAll(getBadWords()); }});
+        return StringUtils.cleanString(text,new ArrayList<String>(ignoredWords){{ addAll(getParserData().toFilter); }});
     }
 }
 

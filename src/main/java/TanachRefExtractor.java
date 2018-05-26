@@ -1,3 +1,5 @@
+import org.apache.jena.ext.com.google.common.collect.ImmutableMap;
+
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
@@ -60,29 +62,16 @@ public class TanachRefExtractor extends RefExtractor {
             "דברי הימים ב"
     );
 
-    protected static String tanachBooks = RefRegex.booksInit(tanachBooksList);
-    protected static String tanachRefRegex = RefRegex.refRegexInit(tanachBooks, booksBand, perekPrefix, location, pasukPrefix, location);
+    static final ParserData data = new ParserData(parserName, tanachBooksList, ImmutableMap.<String, Object>of(
+                                                                                    "band", booksBand,
+                                                                                    "pref1", perekPrefix,
+                                                                                    "pref2", pasukPrefix) );
 
 
-    public TanachRefExtractor() {}
+    //public TanachRefExtractor() {}
 
-    protected String getParserName() {
-        return parserName;
+    protected ParserData getParserData() {
+        return data;
     }
 
-    protected  String getRefPref(){
-        return refPref;
-    }
-
-    protected List<String> getBadWords() {
-        return badWords;
-    }
-
-    protected String getRegularExpression(){
-        return tanachRefRegex;
-    }
-
-    public String getBooks(){
-        return tanachBooks;
-    }
 }

@@ -31,6 +31,7 @@ public class RefRegex {
      * ToDo - consider less flexible, delim=|, no suf and pref, globPref and glob Suf will be added manually.
      */
     static String regexFromList(List<String> listString, String delim, String pref, String suf, String globPref, String globSuf){
+        if (listString==null) return "";
         String regex = "(" + globPref + "(";
         regex += "(" + pref + listString.get(0) + suf + ")";
         for( String string : listString.subList( 1, listString.size() ) ){
@@ -80,14 +81,13 @@ public class RefRegex {
 
     static String refRegexInit(String books, List<String> booksBand, List<String> pref1, String loc1, List<String> pref2, String loc2){
         String buildRefRegex = books + "[\\']?" + orList(delim);
-        if (booksBand!=null) buildRefRegex += bandList(booksBand);
+        buildRefRegex += bandList(booksBand);
 
-        String loc = optionalList(pref1) + loc1 + orList(delim);
-        loc += optionalList(pref2) + loc2;
+        String location = optionalList(pref1) + loc1 + orList(delim) + optionalList(pref2) + loc2;
         //loc += locationRange(loc2);
 
-        buildRefRegex += loc;
-        buildRefRegex += orList(Arrays.asList(locationLargeRange(loc),locationRange(loc2)));
+        buildRefRegex += location;
+        buildRefRegex += orList(Arrays.asList(locationLargeRange(location),locationRange(loc2)));
         //buildRefRegex += locationRange(loc);
 
         buildRefRegex += orList(suffix);

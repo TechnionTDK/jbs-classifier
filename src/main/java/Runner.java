@@ -104,16 +104,15 @@ public class Runner implements Runnable {
         UriConverter.nErrors=0;
 
         for (RefExtractor parser : newWiki.parsers)
-            sourceList2URIs(parser.parserRefs, parser.getRefPref());
+            sourceList2URIs(parser.parserRefs);
 
         pagesUri.close();
         pageRefs.close();
     }
 
 
-    public void sourceList2URIs(List<Reference> referenceList, String refPref) throws Exception {
+    public void sourceList2URIs(List<Reference> referenceList) throws Exception {
         for(Reference reference : referenceList){
-            reference.fullRef= refPref + reference.fullRef;
             Dbg.dbg(Dbg.FINAL.id, reference.fullRef);
             pageRefs.write(reference.fullRef + "\n");
             try {

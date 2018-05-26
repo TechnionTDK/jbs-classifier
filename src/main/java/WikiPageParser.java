@@ -55,7 +55,7 @@ public class WikiPageParser {
         Runner.profiler.sumRestartTimer(Runner.profiler.nFetchWikiParagraphs, Runner.profiler.fetchWikiParagraphsTime);
 
         for (RefExtractor parser : parsers) {
-            Dbg.dbg(Dbg.FOUND.id,"רפרנסים מ: " + parser.getParserName());
+            Dbg.dbg(Dbg.FOUND.id,"רפרנסים מ: " + parser.getParserData().parserName);
             for (String paragraph : paragraphs) {
                 List<String> refs = parser.extract(paragraph);
                 Runner.profiler.sumRestartTimer(Runner.profiler.nFetchWikiRefs, Runner.profiler.fetchWikiRefTime);

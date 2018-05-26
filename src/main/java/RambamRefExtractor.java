@@ -1,15 +1,14 @@
+import org.apache.jena.ext.com.google.common.collect.ImmutableMap;
+
 import java.util.Arrays;
 import java.util.List;
 
 /**
  * Created by eurocom on 01/05/2018.
  */
-public class RambamRefExtractor extends RefExtractor{
+public class RambamRefExtractor extends RefExtractorSubBook{
 
     static String parserName = "רמב\"ם";
-    static String refPref = "";
-    protected static List<String> badWords = Arrays.asList("הלכות", "הלכה" , "ספר", "פרק" );
-
     static List<String> halachotPrefix = Arrays.asList("הלכות");
     static List<String> perekPrefix = Arrays.asList("פרק");
     static List<String> halachaPrefix = Arrays.asList("הלכה", "הלכות");
@@ -49,42 +48,13 @@ public class RambamRefExtractor extends RefExtractor{
             Arrays.asList("סנהדרין והעונשין המסורין להם", "עדות", "ממרים", "אבל", "מלכים ומלחמות")
     );
 
-    protected static List<String> rambamMergedBooksList = RefRegex.mergeSubList(rambamBooksList, rambamHalachotLists, halachotPrefix);
-    protected static String rambamBooks = RefRegex.booksInit(rambamMergedBooksList);
-    protected static String rambamRefRegex = RefRegex.refRegexInit(rambamBooks, null, perekPrefix, location, halachaPrefix, location);
+    static final ParserData data = new ParserData(parserName, halachotPrefix, rambamBooksList,rambamHalachotLists,
+                                            ImmutableMap.<String, Object>of("pref1", perekPrefix,
+                                                                            "pref2", halachaPrefix) );
 
+    //public RambamRefExtractor() {}
 
+    protected ParserData getParserData() {return data;}
 
-    public RambamRefExtractor() {}
-
-    protected String getParserName() {return parserName;}
-
-    protected  String getRefPref(){return refPref;}
-
-    protected List<String> getBadWords() {
-        return badWords;
-    }
-
-    protected String getRegularExpression(){
-        return rambamRefRegex;
-    }
-
-    public String getBooks(){
-        return rambamBooks;
-    }
-
-    List<String> formateReference(String reference) {
-        String[] bookSplit = reference.split("(?<=" + rambamBooks + ")");
-        bookSplit[0] = bookSplit[0].replaceAll(RefRegex.orList(RefRegex.delim), " ");
-        reference = bookSplit[0] + bookSplit[1];
-        Dbg.dbg(Dbg.FOUND.id, reference +" (raw)" );
-        List<String> refs = super.formateReference(reference);
-
-        for (int i = 0; i < refs.size(); i++) {
-            bookSplit = refs.get(i).split("(?<=" + RefRegex.booksInit(rambamBooksList) + ")");
-            refs.set(i, bookSplit[0] + "," + bookSplit[1]);
-        }
-        return refs;
-    }
 
 }

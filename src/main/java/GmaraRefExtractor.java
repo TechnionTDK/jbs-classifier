@@ -1,3 +1,5 @@
+import org.apache.jena.ext.com.google.common.collect.ImmutableMap;
+
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedList;
@@ -8,16 +10,12 @@ import java.util.ListIterator;
  * supplying it relevant gmara regex and adding some extra unique formatting
  */
 public class GmaraRefExtractor extends RefExtractor {
-    String parserName="גמרא";
-    static String refPref = "מסכת ";
-    protected static List<String> badWords = Arrays.asList("דפים","עמודים","עמוד","דף");
+    static String parserName="גמרא";
 
     static List<String> sheetPrefix = Arrays.asList("עמוד", "עמודים");
     static List<String> pagePrefix = Arrays.asList("דפים", "דף");
-    static String sheetRegxMin = "([א,ב])[\\']?";
-    //static String sheetRegx = "(ע[\\\"])?" + "([א,ב])[\\']?";
     static String sheetRegx = "(ע([\\\"])?)?" + "([א,ב])[\\']?";
-    static List<String> booksBand = Arrays.asList("");
+
 
     static List<String> gmaraBooksList = Arrays.asList(
             "ברכות" ,
@@ -59,26 +57,18 @@ public class GmaraRefExtractor extends RefExtractor {
             "חגיגה"
     );
 
-    protected static String gmaraBooks = RefRegex.booksInit(gmaraBooksList);
-    protected static String gmaraRefRegex = RefRegex.refRegexInit(gmaraBooks, null, pagePrefix, location, sheetPrefix, sheetRegx);
+    static final ParserData data = new ParserData(parserName, gmaraBooksList, ImmutableMap.<String, Object>of(
+                                                                                "loc2", sheetRegx,
+                                                                                "pref1", pagePrefix,
+                                                                                "pref2", sheetPrefix) );
 
-    public GmaraRefExtractor() { }
+    //public GmaraRefExtractor() { }
 
-    protected String getParserName() {
-        return parserName;
+    protected ParserData getParserData() {
+        return data;
     }
-    protected String getRefPref() {
-        return refPref;
-    }
-    protected List<String> getBadWords() {
-        return badWords;
-    }
-    protected String getRegularExpression(){
-        return gmaraRefRegex;
-    }
-    public String getBooks(){
-        return gmaraBooks;
-    }
+
+
 
     /* remove ע standing for עמוד*/
     List<String> formateReference(String reference) {
