@@ -16,14 +16,15 @@ Type  | Format
 ###  Creating new parser class:
 - Since parser data is same for all instances, keep all variable static. 
 - A parser class consist of the following:
- - Extending RefExtractor\RefExtractorSubBook, according to type 1\2 references.
- - Initializing static final variable of type ParserData.
-   ParserData constructor expect the following arguments in the following order:
+- Extending RefExtractor\RefExtractorSubBook, according to type 1\2 references.
+- Initializing static final variable of type ParserData.
+  ParserData constructor expect the following arguments in the following order:
+   
 		String parser name - name to identify the parser (mainly for debugs).  
 		[List<String> sub book prefix] - Optional parameter, only in case of type 2 references.
 		List<String> books - List of all possible books.
 		List<List<String>> sub books - Only in case of type 2 references. 
-															Holds list of sub books for each book in the books list. 
+					       Holds list of sub books for each book in the books list. 
 		ImmutableMap.<String, Object> optional parameters - Map (key,value) for all optional parameters:
 							"banned",List<String> - non allowed words, default - empty.
 							"pref1",List<String> - prefix 1, default - empty.
