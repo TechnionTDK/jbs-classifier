@@ -12,6 +12,7 @@ public class RambamRefExtractor extends RefExtractorSubBook{
     static List<String> halachotPrefix = Arrays.asList("הלכות");
     static List<String> perekPrefix = Arrays.asList("פרק");
     static List<String> halachaPrefix = Arrays.asList("הלכה", "הלכות");
+    static String uriTag = "הלכות";
 
 
     static List<String> rambamBooksList = Arrays.asList(
@@ -48,13 +49,14 @@ public class RambamRefExtractor extends RefExtractorSubBook{
             Arrays.asList("סנהדרין והעונשין המסורין להם", "עדות", "ממרים", "אבל", "מלכים ומלחמות")
     );
 
-    static final ParserData data = new ParserData(parserName, halachotPrefix, rambamBooksList,rambamHalachotLists,
-                                            ImmutableMap.<String, Object>of("pref1", perekPrefix,
-                                                                            "pref2", halachaPrefix) );
+    static final ParserData data = new ParserData(parserName, rambamBooksList,rambamHalachotLists,
+                                            ImmutableMap.<String, Object>of( "subBookPref", halachotPrefix,
+                                                                "pref1", perekPrefix,
+                                                                "pref2", halachaPrefix,
+                                                                "uriTag", uriTag) );
 
     //public RambamRefExtractor() {}
 
     protected ParserData getParserData() {return data;}
-
 
 }

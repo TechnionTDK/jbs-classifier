@@ -59,7 +59,7 @@ public class RefRegex {
         int majorIndex = 0;
         for (String major : majors){
             String minorRegEx = orList(minorsArray.get(majorIndex));
-            mergedList.add(major + orList(delim) + optionalList(pref) + minorRegEx);
+            mergedList.add(major + orList(new ArrayList<String>(delim){{ add("(( )?)(\\-)(( )?)"); }}) + optionalList(pref) + minorRegEx);
             majorIndex++;
         }
         return mergedList;

@@ -71,8 +71,8 @@ public class GmaraRefExtractor extends RefExtractor {
 
 
     /* remove ע standing for עמוד*/
-    List<String> formateReference(String reference) {
-        List<String> refs = super.formateReference(reference);
+    List<String> formatReference(String reference) {
+        List<String> refs = super.formatReference(reference);
         for (int i = 0; i < refs.size(); i++)
         {
             String[] refSplit = refs.get(i).split(",");

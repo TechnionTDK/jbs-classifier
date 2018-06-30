@@ -37,7 +37,7 @@ abstract public class RefExtractor extends Extractor {
 
 
     /* format the reference by cleaning/adding extra white spaces and comma */
-    List<String> formateReference(String reference) {
+    List<String> formatReference(String reference) {
         String suff="";
         List<String> refs=new LinkedList<String>();
 
@@ -115,7 +115,7 @@ abstract public class RefExtractor extends Extractor {
         String reference = m.group(0);
         Dbg.dbg(Dbg.FOUND.id, reference +" (raw)" );
         reference = StringUtils.cleanString(reference,badWords);
-        List<String> refs= formateReference(reference);
+        List<String> refs= formatReference(reference);
         for (String ref : refs) {
             Dbg.dbg(Dbg.FOUND.id, ref + " (clean)");
         }

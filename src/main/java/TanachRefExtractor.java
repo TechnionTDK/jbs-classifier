@@ -14,7 +14,7 @@ public class TanachRefExtractor extends RefExtractor {
     protected static List<String> badWords = Arrays.asList( "פסוקים", "פסוק", "ספר", "פרק" );
 
 
-    static List<String> booksBand = Arrays.asList("רבה");
+    static List<String> booksBanned = Arrays.asList("רבה");
     static List<String> perekPrefix = Arrays.asList("פרק");
     static List<String> pasukPrefix = Arrays.asList("פסוק", "פסוקים");
 
@@ -62,8 +62,8 @@ public class TanachRefExtractor extends RefExtractor {
             "דברי הימים ב"
     );
 
-    static final ParserData data = new ParserData(parserName, tanachBooksList, ImmutableMap.<String, Object>of(
-                                                                                    "band", booksBand,
+        static final ParserData data = new ParserData(parserName, tanachBooksList, ImmutableMap.<String, Object>of(
+                                                                                    "band", booksBanned,
                                                                                     "pref1", perekPrefix,
                                                                                     "pref2", pasukPrefix) );
 
