@@ -13,10 +13,11 @@ Type  | Format
 
 -----
 .
-###  Creating new parser class:
-- Since parser data is same for all instances, keep all variable static. 
-- A parser class consist of the following:
-- Extending RefExtractor\RefExtractorSubBook, according to type 1\2 references.
+###  Creating new parser class: 
+Since parser data is same for all instances, keep all variable static. 
+
+A parser class consist on the following:
+- Extending RefExtractor\RefExtractorSubBook class, according to type 1\2 references.
 - Initializing static final variable of type ParserData.
   ParserData constructor expect the following arguments in the following order:
    
