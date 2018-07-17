@@ -84,3 +84,15 @@ pages_uri - URIs by page
 error_pages - Un-parsable pages
 
 profiler - Run time information of each phase
+
+## Expanding the project to recognize more sources
+
+In order to find referneces from mroe books, you need to add compatible parsers.
+
+more information can be found [here](https://github.com/TechnionTDK/jbs-classifier/wiki/adding-parsers-for-new-books)
+
+### Current supported books:
+
+ * Tanach
+ * Talmud Bavli
+ * Mishneh Torah
