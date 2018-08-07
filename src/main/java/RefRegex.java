@@ -14,14 +14,15 @@ import java.util.List;
 public class RefRegex {
 
     static List<String> delim = Arrays.asList(",(( )?)", " ", "(\\|)(( )?)");
-    static List<String> suffix = Arrays.asList("$", ";", ",", "\\.", " ", "\\)","(\\|)",":","\\n");
+    //static List<String> suffix = Arrays.asList("$", ";", ",", ".", "\\.", " ", "\\)","(\\|)",":","\\n");
+    static List<String> suffix = Arrays.asList("[^א-ת\\-]","$");
 
     /* create range regex of location */
     static String locationRange(String location){
-        return "(" + "(( )?)(-|(\\|))(( )?)" + location + ")?";
+        return "(" + "(( )?)(-|(\\|))(( )?)" + location + ")";
     }
     static String locationLargeRange(String location){
-        return "(" + "(( )?)(-)(( )?)" + location + ")?";
+        return "(" + "(( ))(-)(( ))" + location + ")";
     }
 
     /* create regex from list of strings
@@ -87,7 +88,7 @@ public class RefRegex {
         //loc += locationRange(loc2);
 
         buildRefRegex += location;
-        buildRefRegex += orList(Arrays.asList(locationLargeRange(location),locationRange(loc2)));
+        buildRefRegex += optionalNoSpaceList(Arrays.asList(locationLargeRange(location),locationRange(loc2)));
         //buildRefRegex += locationRange(loc);
 
         buildRefRegex += orList(suffix);

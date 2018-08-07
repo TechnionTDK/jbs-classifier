@@ -34,6 +34,7 @@ public class WikiPageParser {
         parsers.add(new TanachRefExtractor());
         parsers.add(new GmaraRefExtractor());
         parsers.add(new RambamRefExtractor());
+        parsers.add(new HalachaRefExtractor());
     }
 
     /* Set Wiki page topic */
@@ -56,6 +57,7 @@ public class WikiPageParser {
 
         for (RefExtractor parser : parsers) {
             Dbg.dbg(Dbg.FOUND.id,"רפרנסים מ: " + parser.getParserData().parserName);
+            //parser.extract( "יורה דעה ק\"ג ד - קד ו" + "$;,. )|:\n");
             for (String paragraph : paragraphs) {
                 List<String> refs = parser.extract(paragraph);
                 Runner.profiler.sumRestartTimer(Runner.profiler.nFetchWikiRefs, Runner.profiler.fetchWikiRefTime);

@@ -123,7 +123,8 @@ abstract public class RefExtractor extends Extractor {
     }
 
     protected String cleanText(String text){
-        return StringUtils.cleanString(text,new ArrayList<String>(ignoredWords){{ addAll(getParserData().toFilter); }});
+        //StringUtils.cleanString(text,new ArrayList<String>(ignoredWords){{ addAll(getParserData().toFilter); }});
+        return StringUtils.cleanWords( StringUtils.cleanString(text,ignoredWords), getParserData().toFilter );
     }
 }
 

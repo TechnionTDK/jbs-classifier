@@ -20,10 +20,17 @@ public class StringUtils {
     }
 
     /* remove all strings in badWords from reference string */
-    public static String cleanString(String reference, List<String> badWords) {
-        for (String badWord : badWords) {
+    public static String cleanString(String reference, List<String> badStrings) {
+        for (String badString : badStrings) {
             //reference = reference.replaceAll("(?i)\\b[^\\w -]*" + badWord + "[^\\w -]*\\b", "");
-            reference = reference.replaceAll("(?i)[\\s]*" + badWord, "");
+            reference = reference.replaceAll("(?i)[\\s]*" + badString, "");
+        }
+        return reference;
+    }
+    /* remove all strings in badWords from reference string */
+    public static String cleanWords(String reference, List<String> badWords) {
+        for (String badWord : badWords) {
+            reference = reference.replaceAll("(?i)[\\s]+" + badWord + "(?i)[\\s]+", " ");
         }
         return reference;
     }

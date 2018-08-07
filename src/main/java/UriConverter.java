@@ -107,6 +107,7 @@ public class UriConverter {
                 uri=uri.split(">")[0];
                 uri="jbr:"+uri;
                 this.uris.add(uri);
+               Dbg.dbg(Dbg.URI.id,"המרת uri הצליחה " + source);
            } catch (Exception e){
                if (xToEnd){
                    Dbg.dbg(Dbg.URI.id,"המרת uri נכשלה, מניח שסוף פרק " + source);
