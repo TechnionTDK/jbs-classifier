@@ -25,14 +25,26 @@ jbr:text-tanach-1-22-19
 The ouput is in the following json format:
 ```
 {
-	"subjects": [{
-		"uri": "https://he.wikipedia.org/wiki/עקידת_יצחק",
-		"jbo:mentions" : ["jbr:text-tanach-1-12-1", "jbr:text-tanach-1-12-2", ..., ]
-	},
+	"subjects": [
 	{
-		"uri": "https://he.wikipedia.org/wiki/מגדל_בבל",
-		"jbo:mentions" : ["jbr:text-tanach-1-11-1", "jbr:text-tanach-1-11-2", ..., ]
-	}]
+	  "uri": "https://he.wikipedia.org/wiki/עקידת_יצחק",
+	  "jbo:mentions": [
+	    {
+	      "pasuk": "jbr:tanach-1-22-1",
+	      "context": "סיפור עֲקֵדַת יִצְחָק (עקדה = קשירה) מופיע במקרא בספר בראשית (כ"ב, א-יט), ולפיו עקד אברהם על פי מצוותו של האלוהים, את יצחק בנו האהוב על מזבח ועצים במטרה לשוחטו ולשורפו כקורבן, וברגע האחרון בטרם פעולת השחיטה נקרא על ידי מלאך האלוהים לא לעשות לבנו מאומה, ושיבח אותו כי הוא "ירא אלוהים", אברהם נשא את עיניו וראה איל אחוז בקרניו בסבך העצים, אותו הקריב על המזבח תחת בנו. מעשה זה נחשב במסורת היהודית ובמסורות נוספות למופת של מסירות נפש ושל אמונה באלוהים, ולניסיון הקשה ביותר מבין עשרה ניסיונות שנתנסה אברהם על ידי האל, ועמד בו.",
+	      "label": "בראשית כב א"
+	    },
+	    {
+	      "pasuk": "jbr:tanach-1-22-2",
+	      "context": "סיפור עֲקֵדַת יִצְחָק (עקדה = קשירה) מופיע במקרא בספר בראשית (כ"ב, א-יט), ולפיו עקד אברהם על פי מצוותו של האלוהים, את יצחק בנו האהוב על מזבח ועצים במטרה לשוחטו ולשורפו כקורבן, וברגע האחרון בטרם פעולת השחיטה נקרא על ידי מלאך האלוהים לא לעשות לבנו מאומה, ושיבח אותו כי הוא "ירא אלוהים", אברהם נשא את עיניו וראה איל אחוז בקרניו בסבך העצים, אותו הקריב על המזבח תחת בנו. מעשה זה נחשב במסורת היהודית ובמסורות נוספות למופת של מסירות נפש ושל אמונה באלוהים, ולניסיון הקשה ביותר מבין עשרה ניסיונות שנתנסה אברהם על ידי האל, ועמד בו.",
+	      "label": "בראשית כב ב"
+	    }
+	  ]
+	},
+	....
+	....
+	....
+    ]
 }
 
 ```
@@ -84,3 +96,15 @@ pages_uri - URIs by page
 error_pages - Un-parsable pages
 
 profiler - Run time information of each phase
+
+## Expanding the project to recognize more sources
+
+In order to find referneces from mroe books, you need to add compatible parsers.
+
+more information can be found [here](https://github.com/TechnionTDK/jbs-classifier/wiki/adding-parsers-for-new-books)
+
+### Current supported books:
+
+ * Tanach
+ * Talmud Bavli
+ * Mishneh Torah
