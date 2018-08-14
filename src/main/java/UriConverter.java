@@ -52,6 +52,7 @@ public class UriConverter {
         this.sefer=this.sefer.replaceAll("תהלים","תהילים");
         this.sefer=this.sefer.replaceAll("ירמיהו","ירמיה");
         this.sefer=this.sefer.replaceAll("ישעיהו","ישעיה");
+        this.sefer=this.sefer.replaceAll("חושן","חשן");
         this.perek = data[1];
         if (data.length == 3) {
             if (data[2].contains("-")) {
@@ -99,7 +100,7 @@ public class UriConverter {
 
     public ArrayList<String> getUris() {
         for (String pasuk : this.psukim) {
-            String source=""  +" \""+this.sefer+" "+this.perek+" "+pasuk+"\"";
+            String source=""  +" \"^"+this.sefer+" .*"+this.perek+" "+pasuk+"\"";
             ResultSet results = new Queries().findUris(source);
            try{
                String uri= ResultSetFormatter.toList(results).get(0).toString();
@@ -132,7 +133,7 @@ public class UriConverter {
 
 
 
-          UriConverter u=new UriConverter("ירמיה,ב,א");
+          UriConverter u=new UriConverter("חושן משפט, ג, א");
 
        System.out.println( u.getUris());
 
