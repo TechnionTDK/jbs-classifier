@@ -14,8 +14,8 @@ public class Queries {
                 ("PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>"
                         + "PREFIX jbr: <http://jbs.technion.ac.il/resource/>"
                         + "PREFIX jbo: <http://jbs.technion.ac.il/ontology/>"
-                        + "SELECT ?uri from <http://jbs.technion.ac.il> where { ?uri rdfs:label"
-                        + source + ".}");
+                        + "SELECT ?uri from <http://jbs.technion.ac.il> where { ?uri rdfs:label ?temp."
+                        +  "FILTER regex (?temp, " + source + ", \"i\")" + ".}");
 
         Query q = queryStr.asQuery();
         QueryExecution qExe = QueryExecutionFactory.sparqlService("http://tdk3.csf.technion.ac.il:8890/sparql", q);

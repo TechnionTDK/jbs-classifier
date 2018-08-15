@@ -56,7 +56,7 @@ public class RefRegex {
     }
 
     static List<String> mergeSubList (List<String> majors, List<List<String>> minorsArray, List<String> pref){
-        List<String> mergedList = new ArrayList<>();
+        List<String> mergedList = new ArrayList<String>();
         int majorIndex = 0;
         for (String major : majors){
             String minorRegEx = orList(minorsArray.get(majorIndex));
