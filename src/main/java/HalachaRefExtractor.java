@@ -27,4 +27,14 @@ public class HalachaRefExtractor extends RefExtractor{
     protected ParserData getParserData() {
         return data;
     }
+
+    List<String> formatReference(String reference) {
+        List<String> refs = super.formatReference(reference);
+        for (int i = 0; i < refs.size(); i++)
+        {
+            String[] refSplit = refs.get(i).split(",");
+            refs.set(i, refSplit[0] + " .*," + refSplit[1] + "," + refSplit[2]);
+        }
+        return refs;
+    }
 }

@@ -18,9 +18,10 @@ abstract public class RefExtractorSubBook extends RefExtractor{
 
         //Add ',' as a delimiter between top level book and sub level
         for (int i = 0; i < refs.size(); i++) {
-            bookSplit = refs.get(i).split("(?<=" + getParserData().booksRegexTopLevel + ")");
+            bookSplit = refs.get(i).split("(?<=" + getParserData().booksRegexTopLevel + ") ");
             //refs.set(i, bookSplit[0] + "," + bookSplit[1]);
-            refs.set(i, getParserData().uriTagging + bookSplit[1]);
+            //refs.set(i, getParserData().uriTagging + bookSplit[1]);
+            refs.set(i, bookSplit[1]);
         }
         return refs;
     }

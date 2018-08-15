@@ -53,7 +53,7 @@ public class ParserData {
         if (params.containsKey("uriTag")) {
             if (!(params.get("uriTag") instanceof String))
                 throw new IllegalArgumentException("uriTag should be of type String");
-            uriTagging = (String)params.get("uriTag");
+            uriTagging = (String)params.get("uriTag") + " ";
         }
 
         toFilter.addAll(pref1);

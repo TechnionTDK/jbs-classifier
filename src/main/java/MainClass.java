@@ -2,6 +2,8 @@ import info.bliki.wiki.dump.*;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Scanner;
@@ -12,6 +14,7 @@ import java.util.Scanner;
 public class MainClass {
 
 	static boolean allWiki = false;
+	static WikiArticle testwiki=null;
 	static Scanner in = new Scanner(System.in);
 	static ArrayList<String> titles = new ArrayList<String>();
 
@@ -20,6 +23,11 @@ public class MainClass {
 			return;
 		if (allWiki || !titles.isEmpty())
 			processWikis();
+		else if (testwiki!=null){
+			System.out.println(testwiki.getText());
+			new Runner(testwiki).run();
+		}
+
 	}
 
 	static void usageMsg(boolean fullMsg, String errorMsg) {
@@ -88,6 +96,20 @@ public class MainClass {
 			}
 			currArg++;
 		}
+		else if (args[0].equals("--test") || args[0].equals("-t")) {
+			allWiki = false;
+			String path="";
+			if (args.length <= currArg || args[currArg].equals("--dbg")) {
+				System.out.println("\nNo file mentioned, using default - test.in \n");
+				path="test.in";
+			} else {
+				path = args[currArg];
+				currArg++;
+			}
+			String fileContent = new String ( Files.readAllBytes( Paths.get(path) ) );
+			testwiki = new WikiArticle();
+			testwiki.setText(fileContent);
+		}
 		else {
 			usageMsg(false, "\nUnknown argument: " + args[0] + "\n");
 			return false;
@@ -99,19 +121,18 @@ public class MainClass {
 		if (!args[currArg].equals("--dbg") && !args[currArg].equals("-d")) {
 			usageMsg(false, "\nBad argument \'" + args[currArg] + "\' after \'" + args[0] + "\' expected no argument or --dbg\n");
 			return false;
-		} else {
-			if (++currArg >= args.length) {
-				System.out.println("\nNo debug flags, continue with defaults \n");
-				return true;
-			}
-			Dbg.enabledFlags = 0;
-			for(; currArg< args.length; currArg++) {
-				try {
-					Dbg.enabledFlags |= Dbg.valueOf(args[currArg]).id;
-				} catch (Exception e) {
-					usageMsg(false, "failed to set debug flag: " + args[currArg]);
-					return false;
-				}
+		}
+		if (++currArg >= args.length) {
+			System.out.println("\nNo debug flags, continue with defaults \n");
+			return true;
+		}
+		Dbg.enabledFlags = 0;
+		for(; currArg< args.length; currArg++) {
+			try {
+				Dbg.enabledFlags |= Dbg.valueOf(args[currArg]).id;
+			} catch (Exception e) {
+				usageMsg(false, "failed to set debug flag: " + args[currArg]);
+				return false;
 			}
 		}
 		return true;
