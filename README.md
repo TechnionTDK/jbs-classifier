@@ -103,8 +103,11 @@ In order to find referneces from mroe books, you need to add compatible parsers.
 
 more information can be found [here](https://github.com/TechnionTDK/jbs-classifier/wiki/adding-parsers-for-new-books)
 
+To see the whole process of adding a new book to the project, you can check out this [example](https://github.com/TechnionTDK/jbs-classifier/wiki/Example-of-adding-a-book-to-the-project)
+
 ### Current supported books:
 
  * Tanach
  * Talmud Bavli
  * Mishneh Torah
+ * Shulchan Aruch
