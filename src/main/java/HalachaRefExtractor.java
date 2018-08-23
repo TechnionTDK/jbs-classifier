@@ -2,6 +2,7 @@ import org.apache.jena.ext.com.google.common.collect.ImmutableMap;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by eurocom on 22/07/2018.
@@ -17,24 +18,20 @@ public class HalachaRefExtractor extends RefExtractor{
             "אורח חיים",
             "יורה דעה",
             "אבן העזר",
-            "חושן משפט"
+            "חושן משפט",
+            "חשן משפט"
     );
+
+    static Map<String,String> replaceMap = ImmutableMap.of("חושן","חשן" );
 
     static final ParserData data = new ParserData(parserName, halachBooksList, ImmutableMap.<String, Object>of(
             "pref1", simanPrefix,
-            "pref2", saifPrefix) );
+            "pref2", saifPrefix,
+            "allowSubBooks", true,
+            "replacements", replaceMap) );
 
     protected ParserData getParserData() {
         return data;
     }
 
-    List<String> formatReference(String reference) {
-        List<String> refs = super.formatReference(reference);
-        for (int i = 0; i < refs.size(); i++)
-        {
-            String[] refSplit = refs.get(i).split(",");
-            refs.set(i, refSplit[0] + " .*," + refSplit[1] + "," + refSplit[2]);
-        }
-        return refs;
-    }
 }

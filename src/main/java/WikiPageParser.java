@@ -62,7 +62,7 @@ public class WikiPageParser {
                 List<String> refs = parser.extract(paragraph);
                 Runner.profiler.sumRestartTimer(Runner.profiler.nFetchWikiRefs, Runner.profiler.fetchWikiRefTime);
                 for (String ref : refs)
-                    parser.parserRefs.add(new Reference(parser.getParserData().uriTagging + ref, paragraph));
+                    parser.parserRefs.add(new Reference(ref, paragraph));
                 Runner.profiler.sumRestartTimer(Runner.profiler.nProcWikiRefs, Runner.profiler.procWikiRefTime);
             }
         }

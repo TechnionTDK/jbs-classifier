@@ -1,7 +1,4 @@
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by eurocom on 19/05/2018.
@@ -14,7 +11,8 @@ public class ParserData {
     String booksRegex;
     String refRegex;
     String uriTagging = "";
-
+    boolean allowAnySubBook = false;
+    Map<String, String> replacements = new HashMap<String,String>();
 
     void init(String name, List<String> booksList, Map<String, Object> params){
         parserName = name;
@@ -55,7 +53,16 @@ public class ParserData {
                 throw new IllegalArgumentException("uriTag should be of type String");
             uriTagging = (String)params.get("uriTag") + " ";
         }
-
+        if (params.containsKey("replacements")) {
+            if (!(params.get("replacements") instanceof Map))
+                throw new IllegalArgumentException("replacements should be of type Map<String,String>");
+            replacements = (Map<String,String>)params.get("replacements");
+        }
+        if (params.containsKey("allowSubBooks")) {
+            if (!(params.get("allowSubBooks") instanceof Boolean))
+                throw new IllegalArgumentException("allowSubBooks should be of type boolean");
+            allowAnySubBook = (boolean)params.get("allowSubBooks");
+        }
         toFilter.addAll(pref1);
         toFilter.addAll(pref2);
 
@@ -79,5 +86,4 @@ public class ParserData {
     ParserData(String name, List<String> booksList, Map<String, Object> params){
         init(name, booksList, params);
     }
-
 }

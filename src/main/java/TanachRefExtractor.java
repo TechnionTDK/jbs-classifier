@@ -3,6 +3,7 @@ import org.apache.jena.ext.com.google.common.collect.ImmutableMap;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 /* Inherit and relay on WikiBookRefs functionality.
  * supplying it relevant Tanach regex and adding some extra unique formatting
@@ -10,9 +11,6 @@ import java.util.List;
 public class TanachRefExtractor extends RefExtractor {
 
     static String parserName = "תנ\"ך";
-    static String refPref = "";
-    protected static List<String> badWords = Arrays.asList( "פסוקים", "פסוק", "ספר", "פרק" );
-
 
     static List<String> booksBanned = Arrays.asList("רבה");
     static List<String> perekPrefix = Arrays.asList("פרק");
@@ -62,13 +60,17 @@ public class TanachRefExtractor extends RefExtractor {
             "דברי הימים ב"
     );
 
-        static final ParserData data = new ParserData(parserName, tanachBooksList, ImmutableMap.<String, Object>of(
+    static Map<String,String> replaceMap = ImmutableMap.of("תהלים", "תהילים",
+                                                           "ירמיהו", "ירמיה",
+                                                           "ישעיהו", "ישעיה" );
+
+
+    static ParserData data = new ParserData(parserName, tanachBooksList, ImmutableMap.<String, Object>of(
                                                                                     "band", booksBanned,
                                                                                     "pref1", perekPrefix,
-                                                                                    "pref2", pasukPrefix) );
+                                                                                    "pref2", pasukPrefix,
+                                                                                    "replacements", replaceMap) );
 
-
-    //public TanachRefExtractor() {}
 
     protected ParserData getParserData() {
         return data;

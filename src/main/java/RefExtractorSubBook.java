@@ -14,7 +14,7 @@ abstract public class RefExtractorSubBook extends RefExtractor{
         reference = bookSplit[0] + bookSplit[1];
         Dbg.dbg(Dbg.FOUND.id, reference +" (raw)" );
 
-        List<String> refs = super.formatReference(reference);
+        List<String> refs = super.formatReference();
 
         //Add ',' as a delimiter between top level book and sub level
         for (int i = 0; i < refs.size(); i++) {
