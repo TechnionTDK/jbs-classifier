@@ -15,7 +15,7 @@ public class RefRegex {
 
     static List<String> delim = Arrays.asList(",(( )?)", " ", "(\\|)(( )?)");
     //static List<String> suffix = Arrays.asList("$", ";", ",", ".", "\\.", " ", "\\)","(\\|)",":","\\n");
-    static List<String> suffix = Arrays.asList("[^א-ת\\-]","$");
+    static List<String> suffix = Arrays.asList("[^א-ת\\-=]","$");
 
     /* create range regex of location */
     static String locationRange(String location){
