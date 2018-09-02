@@ -23,7 +23,7 @@ abstract public class RefExtractor extends Extractor {
     static List<String> ignoredWords = Arrays.asList("\\{", "\\}", "\\\'", "\\[", "\\]");
 
     String rawRef;
-    List<String> cleanRefs;
+    List<String> cleanRefs=new LinkedList<String>();
 
     /*list to hold all found references by the parser*/
     List<Reference> parserRefs=new LinkedList<Reference>();
@@ -54,9 +54,8 @@ abstract public class RefExtractor extends Extractor {
     }
 
     /* format the reference by cleaning/adding extra white spaces and comma */
-    List<String> formatReference() {
+    void formatReference() {
         String suff="";
-        List<String> refs=new LinkedList<String>();
 
         //clean suffix
         rawRef = rawRef.replaceAll("(?i)[\\s]+$", "");
@@ -98,7 +97,7 @@ abstract public class RefExtractor extends Extractor {
                 Dbg.dbg(Dbg.FOUND.id,"large range format: same chapter: " + bookSplit[1]);
             } else {
                 String ref1 = bookSplit[0] + "," + from + "- ";
-                refs.add(ref1.replaceAll(",", ", "));
+                cleanRefs.add(ref1.replaceAll(",", ", "));
                 Dbg.dbg(Dbg.FOUND.id,"large range format: different chapters: " + ref1.replaceAll(",", ", "));
                 bookSplit[1] = "," + to.split(",")[0] + ",א-" + to.split(",")[1];
                 Dbg.dbg(Dbg.FOUND.id,"                                       : " + bookSplit[1]);
@@ -123,8 +122,7 @@ abstract public class RefExtractor extends Extractor {
             }
         }
 
-        refs.add(rawRef);
-        return refs;
+        cleanRefs.add(rawRef);
     }
 
     /* For each found reference in the matcher will clean badWords, format and add to sourceList. */
@@ -132,7 +130,8 @@ abstract public class RefExtractor extends Extractor {
         rawRef = m.group(0);
         Dbg.dbg(Dbg.FOUND.id, rawRef +" (raw)" );
         rawRef = StringUtils.cleanString(rawRef,badWords);
-        cleanRefs = formatReference();
+        cleanRefs.clear();
+        formatReference();
         prepareURI();
         return cleanRefs;
     }

@@ -72,14 +72,13 @@ public class GmaraRefExtractor extends RefExtractor {
 
 
     /* remove ע standing for עמוד*/
-    List<String> formatReference() {
-        List<String> refs = super.formatReference();
-        for (int i = 0; i < refs.size(); i++)
+    void formatReference() {
+        super.formatReference();
+        for (int i = 0; i < cleanRefs.size(); i++)
         {
-            String[] refSplit = refs.get(i).split(",");
+            String[] refSplit = cleanRefs.get(i).split(",");
             refSplit[2] = refSplit[2].replaceAll("ע", "");
-            refs.set(i, refSplit[0] + "," + refSplit[1] + "," + refSplit[2]);
+            cleanRefs.set(i, refSplit[0] + "," + refSplit[1] + "," + refSplit[2]);
         }
-        return refs;
     }
 }

@@ -7,23 +7,22 @@ import java.util.List;
 abstract public class RefExtractorSubBook extends RefExtractor{
 
 
-    List<String> formatReference(String reference) {
+    void formatReference() {
         //Before formating unify book and sub book by removing delimiters
-        String[] bookSplit = reference.split("(?<=" + getParserData().booksRegex + ")");
+        String[] bookSplit = rawRef.split("(?<=" + getParserData().booksRegex + ")");
         bookSplit[0] = bookSplit[0].replaceAll(RefRegex.orList(new ArrayList<String>(RefRegex.delim){{ add("(( )?)(\\-)(( )?)"); }}), " ");
-        reference = bookSplit[0] + bookSplit[1];
-        Dbg.dbg(Dbg.FOUND.id, reference +" (raw)" );
+        rawRef = bookSplit[0] + bookSplit[1];
+        Dbg.dbg(Dbg.FOUND.id, rawRef +" (raw)" );
 
-        List<String> refs = super.formatReference();
+        super.formatReference();
 
         //Add ',' as a delimiter between top level book and sub level
-        for (int i = 0; i < refs.size(); i++) {
-            bookSplit = refs.get(i).split("(?<=" + getParserData().booksRegexTopLevel + ") ");
+        for (int i = 0; i < cleanRefs.size(); i++) {
+            bookSplit = cleanRefs.get(i).split("(?<=" + getParserData().booksRegexTopLevel + ") ");
             //refs.set(i, bookSplit[0] + "," + bookSplit[1]);
             //refs.set(i, getParserData().uriTagging + bookSplit[1]);
-            refs.set(i, bookSplit[1]);
+            cleanRefs.set(i, bookSplit[1]);
         }
-        return refs;
     }
 
 }
