@@ -9,8 +9,9 @@ import java.util.Date;
 import java.text.SimpleDateFormat;
 
 import info.bliki.wiki.dump.*;
+import static utils.Dbg.*;
 
-//import StringUtils;
+//import utils.StringUtils;
 
 /**
  * Created by netanel on 26/06/2017.
@@ -71,7 +72,7 @@ public class Runner implements Runnable {
 	            return;
 
             /* write JsonTuple to json file */
-            Dbg.dbg(Dbg.FINAL.id | Dbg.PAGE.id, "מוסיף נושא:  " + newWiki.pageTitle + "\n");
+            dbg(FINAL.id | PAGE.id, "מוסיף נושא:  " + newWiki.pageTitle + "\n");
             writeJsonTuple(jt);
             profiler.sumRestartTimer(profiler.numFileWrite, profiler.writeToFileTime);
 
@@ -100,7 +101,7 @@ public class Runner implements Runnable {
         pagesUri = new FileWriter(statDir + "pages_uri", true);
         pageRefs.write(newWiki.pageTitle + ":\n");
         
-        profiler.restartTimer();
+                            profiler.restartTimer();
         UriConverter.nErrors=0;
 
         for (RefExtractor parser : newWiki.parsers)
@@ -113,7 +114,7 @@ public class Runner implements Runnable {
 
     public void sourceList2URIs(List<Reference> referenceList) throws Exception {
         for(Reference reference : referenceList){
-            Dbg.dbg(Dbg.FINAL.id, reference.fullRef);
+            dbg(FINAL.id, reference.fullRef);
             pageRefs.write(reference.fullRef + "\n");
             try {
                 ArrayList<String> uris = new UriConverter(reference.fullRef).getUris();
@@ -126,7 +127,7 @@ public class Runner implements Runnable {
                 }
                 ArrayList<MentionsTuple> mts = new ArrayList<MentionsTuple>();
                 for (String uri : uris) {
-                    Dbg.dbg(Dbg.URI.id, uri);
+                    dbg(URI.id, uri);
                     pagesUri.write(uri + "\n");
                     MentionsTuple mentionsTuple = new MentionsTuple(uri, reference.paragraph, reference.fullRef);
                     mts.add(mentionsTuple);
@@ -150,7 +151,9 @@ public class Runner implements Runnable {
 
         long totTime = new Date().getTime() - profiler.startRunTime;
         FileWriter profilerFile = new FileWriter(statDir + "profiler", false);
-        profilerFile.write("fetch wiki time: " + profiler.fetchWikiTotalTime.longValue() +
+        profilerFile.write(
+                // constructor should be nothing
+                "fetch wiki time: " + profiler.fetchWikiTotalTime.longValue() +
                 "\nfetched wikis: " + profiler.nFetchWiki.intValue() +
 
                 "\n\nprocess time: " + profiler.procWikiTotalTime.longValue() +

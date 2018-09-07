@@ -1,11 +1,11 @@
 import info.bliki.wiki.dump.*;
+import utils.Dbg;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Scanner;
 
 /**
@@ -86,15 +86,18 @@ public class MainClass {
 		}
 		else if (args[0].equals("--file") || args[0].equals("-f")) {
 			allWiki = false;
-			if (args.length <= currArg) {
-				usageMsg(false, "\nNo file mentioned \n");
-				return false;
+			String path="";
+			if (args.length <= currArg || args[currArg].equals("--dbg")) {
+				System.out.println("\nNo file mentioned, using default - topics.in \n");
+				path="topics.in";
+			} else {
+				path = args[currArg];
+				currArg++;
 			}
-			if (!readTitlesFromFile(args[currArg])) {
+			if (!readTitlesFromFile(path)) {
 				usageMsg(false, null);
 				return false;
 			}
-			currArg++;
 		}
 		else if (args[0].equals("--test") || args[0].equals("-t")) {
 			allWiki = false;

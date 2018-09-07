@@ -11,7 +11,7 @@ public class ParserData {
     String booksRegex;
     String refRegex;
     String uriTagging = "";
-    boolean allowAnySubBook = false;
+    Boolean allowAnySubBook = false;
     Map<String, String> replacements = new HashMap<String,String>();
 
     void init(String name, List<String> booksList, Map<String, Object> params){
@@ -60,8 +60,8 @@ public class ParserData {
         }
         if (params.containsKey("allowSubBooks")) {
             if (!(params.get("allowSubBooks") instanceof Boolean))
-                throw new IllegalArgumentException("allowSubBooks should be of type boolean");
-            allowAnySubBook = (boolean)params.get("allowSubBooks");
+                throw new IllegalArgumentException("allowSubBooks should be of type Boolean");
+            allowAnySubBook = (Boolean)params.get("allowSubBooks");
         }
         toFilter.addAll(pref1);
         toFilter.addAll(pref2);

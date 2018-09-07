@@ -1,7 +1,7 @@
-import java.lang.reflect.Array;
+import static utils.Dbg.*;
+
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.LinkedList;
 import java.util.List;
 
 /*
@@ -13,9 +13,9 @@ import java.util.List;
  */
 public class RefRegex {
 
-    static List<String> delim = Arrays.asList(",(( )?)", " ", "(\\|)(( )?)");
+    static List<String> delim = Arrays.asList("(( )?),(( )?)", " ", "(( )?)(\\|)(( )?)");
     //static List<String> suffix = Arrays.asList("$", ";", ",", ".", "\\.", " ", "\\)","(\\|)",":","\\n");
-    static List<String> suffix = Arrays.asList("[^א-ת\\-=]","$");
+    static List<String> suffix = Arrays.asList("[^א-ת\\-\"=]","$");
 
     /* create range regex of location */
     static String locationRange(String location){
@@ -33,6 +33,8 @@ public class RefRegex {
      */
     static String regexFromList(List<String> listString, String delim, String pref, String suf, String globPref, String globSuf){
         if (listString==null) return "";
+        //if (!globPref.equals("")) globPref = "(" + globPref + ")";
+        //if (!globSuf.equals("")) globSuf = "(" + globSuf + ")";
         String regex = "(" + globPref + "(";
         regex += "(" + pref + listString.get(0) + suf + ")";
         for( String string : listString.subList( 1, listString.size() ) ){
@@ -92,7 +94,7 @@ public class RefRegex {
         //buildRefRegex += locationRange(loc);
 
         buildRefRegex += orList(suffix);
-        Dbg.dbg(Dbg.INFO.id,buildRefRegex);
+        dbg(INFO.id,buildRefRegex);
         return buildRefRegex;
     }
 }

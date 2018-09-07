@@ -1,6 +1,7 @@
 //import com.sun.deploy.util.BlackList;
 
 import info.bliki.wiki.dump.*;
+import static utils.Dbg.*;
 
 import java.io.IOException;
 import java.util.LinkedList;
@@ -40,7 +41,7 @@ public class WikiPageParser {
     /* Set Wiki page topic */
     void setPageTitle(){
         pageTitle = wikiPage.getTitle();
-        Dbg.dbg(Dbg.ANY.id, "\nנושא: " + pageTitle);
+        dbg(ANY.id, "\nנושא: " + pageTitle);
     }
 
     /* Looking for Wiki page categories and add them to categoriesList*/
@@ -55,10 +56,11 @@ public class WikiPageParser {
         //List<String> paragraphs = new ParagraphExtractor(TanachRefExtractor.tanachRefRegex).extract(wikiPage.getText());
         Runner.profiler.sumRestartTimer(Runner.profiler.nFetchWikiParagraphs, Runner.profiler.fetchWikiParagraphsTime);
 
-        for (RefExtractor parser : parsers) {
-            Dbg.dbg(Dbg.FOUND.id,"רפרנסים מ: " + parser.getParserData().parserName);
+        for (String paragraph : paragraphs) {
+            dbg(INFO.id, paragraph);
+            for (RefExtractor parser : parsers) {
+            dbg(FOUND.id,"רפרנסים מ: " + parser.getParserData().parserName);
             //parser.extract( "יורה דעה ק\"ג ד - קד ו" + "$;,. )|:\n");
-            for (String paragraph : paragraphs) {
                 List<String> refs = parser.extract(paragraph);
                 Runner.profiler.sumRestartTimer(Runner.profiler.nFetchWikiRefs, Runner.profiler.fetchWikiRefTime);
                 for (String ref : refs)

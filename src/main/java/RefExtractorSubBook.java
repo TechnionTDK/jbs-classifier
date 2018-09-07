@@ -1,5 +1,6 @@
+import static utils.Dbg.*;
+
 import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Created by eurocom on 23/05/2018.
@@ -12,7 +13,7 @@ abstract public class RefExtractorSubBook extends RefExtractor{
         String[] bookSplit = rawRef.split("(?<=" + getParserData().booksRegex + ")");
         bookSplit[0] = bookSplit[0].replaceAll(RefRegex.orList(new ArrayList<String>(RefRegex.delim){{ add("(( )?)(\\-)(( )?)"); }}), " ");
         rawRef = bookSplit[0] + bookSplit[1];
-        Dbg.dbg(Dbg.FOUND.id, rawRef +" (raw)" );
+        dbg(FOUND.id, rawRef +" (raw)" );
 
         super.formatReference();
 

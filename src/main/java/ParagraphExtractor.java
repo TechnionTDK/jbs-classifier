@@ -1,8 +1,7 @@
-import java.util.Arrays;
-import java.util.LinkedList;
 import java.util.ArrayList;
-import java.util.List;
-import java.util.regex.Matcher;
+import utils.StringUtils;
+
+import static utils.StringUtils.cleanStringsNoSpace;
 
 public class ParagraphExtractor extends Extractor {
 
@@ -17,7 +16,7 @@ public class ParagraphExtractor extends Extractor {
     }
 
     protected String cleanText(String text){
-        return StringUtils.cleanString(text, new ArrayList<String>(RefExtractor.ignoredWords));
+        return cleanStringsNoSpace(text, RefExtractor.ignoredPrefSuf);
     }
 
 }

@@ -1,14 +1,10 @@
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.jsoup.parser.Tag;
 
-import info.bliki.wiki.dump.*;
-import info.bliki.wiki.model.WikiModel;
+import static utils.Dbg.*;
 
 import java.util.*;
 import java.util.regex.Matcher;
 
-import static com.sun.org.apache.xalan.internal.xsltc.compiler.util.Type.String;
+import static utils.StringUtils.*;
 
 /**
  * Created by eurocom on 18/06/2017.
@@ -18,9 +14,19 @@ import static com.sun.org.apache.xalan.internal.xsltc.compiler.util.Type.String;
  */
 abstract public class RefExtractor extends Extractor {
     /* strings to filter etc. global to all parsers*/
-    static String location = "([א-ת&&[^ץ,^ף,^ן,^ך,^ם]][\\\"]?){1,3}[\\']?";
+
+    static String locUnity = "[א-ט]";
+    static String locTens = "[י-צ&&[^ץ,^ף,^ן,^ך,^ם]]";
+    static String locHundreds = "[ק-ת]";
+    static String locAll = "[א-ת&&[^ץ,^ף,^ן,^ך,^ם]]";
+    static String location = RefRegex.regexFromList(Arrays.asList(locHundreds,locTens,locUnity),
+            "", "(", "[\\\"]?)?","(?=" + locAll + ")", "[\\']?");
+
+
+    //static String location = "([א-ת&&[^ץ,^ף,^ן,^ך,^ם]][\\\"]?){1,2}[\\']?";
     static List<String> badWords = Arrays.asList("\\\'", "\\\"", "\\.", ";", "\\)", "\\(");
-    static List<String> ignoredWords = Arrays.asList("\\{", "\\}", "\\\'", "\\[", "\\]");
+    static List<String> ignoredPrefSuf = Arrays.asList("\\{", "\\}", "\\[", "\\]");
+    static List<String> ignoredMiddle = Arrays.asList("\\\'", "\\\"");
 
     String rawRef;
     List<String> cleanRefs=new LinkedList<String>();
@@ -39,7 +45,7 @@ abstract public class RefExtractor extends Extractor {
         for (int i = 0; i < cleanRefs.size(); i++)
         {
             String ref = cleanRefs.get(i);
-            Dbg.dbg(Dbg.FOUND.id, ref + " (clean)");
+            dbg(FOUND.id, ref + " (clean)");
 
             if (getParserData().allowAnySubBook) {
                 String[] refSplit = ref.split(",");
@@ -79,28 +85,28 @@ abstract public class RefExtractor extends Extractor {
 
         //large range format: שמות ג,כב - ד,יב
         if (bookSplit[1].split("-").length>1 && bookSplit[1].split("-")[1].split(",").length>1) {
-            Dbg.dbg(Dbg.FOUND.id,"large range format: " + bookSplit[0] + bookSplit[1]);
+            dbg(FOUND.id,"large range format: " + bookSplit[0] + bookSplit[1]);
             String from = bookSplit[1].split("-")[0].split("^,")[1];
             String to = bookSplit[1].split("-")[1];
-            Dbg.dbg(Dbg.FOUND.id,"large range format: from:" + from + "to:" + to);
+            dbg(FOUND.id,"large range format: from:" + from + "to:" + to);
             if (!Arrays.asList(UriConverter.psukimSet).contains(to.split(",")[0])){
                 //mistakenly detected
                 bookSplit[1] = "," + from;
-                Dbg.dbg(Dbg.FOUND.id,"large range format: mistakenly detected, changing to: " + bookSplit[1]);
+                dbg(FOUND.id,"large range format: mistakenly detected, changing to: " + bookSplit[1]);
             } else if (!Arrays.asList(UriConverter.psukimSet).contains(to.split(",")[1])){
                 //mistakenly detected, regular range
                 bookSplit[1] = "," + from  + "-" + to.split(",")[0];;
-                Dbg.dbg(Dbg.FOUND.id,"large range format: mistakenly detected, changing to regular range: " + bookSplit[1]);
+                dbg(FOUND.id,"large range format: mistakenly detected, changing to regular range: " + bookSplit[1]);
             } else if (from.split(",")[0].equals(to.split(",")[0]) ){
                 //same chapter
                 bookSplit[1] = "," + from + "-" + to.split(",")[1];
-                Dbg.dbg(Dbg.FOUND.id,"large range format: same chapter: " + bookSplit[1]);
+                dbg(FOUND.id,"large range format: same chapter: " + bookSplit[1]);
             } else {
                 String ref1 = bookSplit[0] + "," + from + "- ";
                 cleanRefs.add(ref1.replaceAll(",", ", "));
-                Dbg.dbg(Dbg.FOUND.id,"large range format: different chapters: " + ref1.replaceAll(",", ", "));
+                dbg(FOUND.id,"large range format: different chapters: " + ref1.replaceAll(",", ", "));
                 bookSplit[1] = "," + to.split(",")[0] + ",א-" + to.split(",")[1];
-                Dbg.dbg(Dbg.FOUND.id,"                                       : " + bookSplit[1]);
+                dbg(FOUND.id,"                                       : " + bookSplit[1]);
             }
         }
 
@@ -128,8 +134,8 @@ abstract public class RefExtractor extends Extractor {
     /* For each found reference in the matcher will clean badWords, format and add to sourceList. */
     public List<String> normalize(Matcher m){
         rawRef = m.group(0);
-        Dbg.dbg(Dbg.FOUND.id, rawRef +" (raw)" );
-        rawRef = StringUtils.cleanString(rawRef,badWords);
+        dbg(FOUND.id, rawRef +" (raw)" );
+        rawRef = cleanStringsNoSpace(rawRef,badWords);
         cleanRefs.clear();
         formatReference();
         prepareURI();
@@ -137,8 +143,13 @@ abstract public class RefExtractor extends Extractor {
     }
 
     protected String cleanText(String text){
-        //StringUtils.cleanString(text,new ArrayList<String>(ignoredWords){{ addAll(getParserData().toFilter); }});
-        return StringUtils.cleanWords( StringUtils.cleanString(text,ignoredWords), getParserData().toFilter );
+        //utils.StringUtils.cleanString(text,new ArrayList<String>(ignoredWords){{ addAll(getParserData().toFilter); }});
+        text = cleanStringsNoSpace(text,ignoredMiddle);
+        text = cleanStringsSpace(text , ignoredPrefSuf);
+        text = cleanWords(text , getParserData().toFilter );
+        text = cleanExtraSpaces(text);
+        //System.out.println(text);
+        return text;
     }
 }
 

@@ -1,6 +1,5 @@
 import org.apache.jena.query.*;
-import java.io.FileWriter;
-import java.io.IOException;
+import utils.Dbg;
 
 import java.util.ArrayList;
 

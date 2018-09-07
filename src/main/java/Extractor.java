@@ -1,8 +1,9 @@
+import utils.StringUtils;
+
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Arrays;
 import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 public abstract class Extractor {
     List<String> extract(String text){
