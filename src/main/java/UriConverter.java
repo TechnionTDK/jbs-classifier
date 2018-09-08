@@ -1,5 +1,5 @@
 import org.apache.jena.query.*;
-import utils.Dbg;
+import static utils.Dbg.*;
 
 import java.util.ArrayList;
 
@@ -8,6 +8,7 @@ public class UriConverter {
     String source;
     ArrayList<String> uris;
     String sefer, perek;
+    String source2Connvert;
     ArrayList<String> psukim;
     static String[] psukimSet=   {
             "א", "ב", "ג", "ד", "ה", "ו", "ז", "ח", "ט", "י",
@@ -35,6 +36,7 @@ public class UriConverter {
     };
     static int nErrors=0;
     static int maxLegitErrors=10;
+    static int rangeTries=2;
     boolean xToEnd=false;
 
     public UriConverter(String source) {
@@ -74,55 +76,69 @@ public class UriConverter {
         String start = data[0];
         String end = data[1];
 
-        if (end.equals(" ")){
+        if (end.equals(" ")) {
             xToEnd = true;
+        } else {
+            int i= rangeTries;
+            for (; i>0; i--) {
+                try {
+                    getUri(end);
+                    break;
+                } catch (Exception e) {
+                    dbg(ERROR.id, "המרת uri נכשלה " + source2Connvert);
+                    dbg(ERROR.id, "Will try to convert end of range " + (i-1) + " more times");
+                }
+            }
+            if (i==0) {
+                dbg(ERROR.id, "Number of tries (" + rangeTries + ") exceeded. Range Too large, not using range");
+                this.psukim.add(start);
+                return;
+            }
         }
 
         boolean flag = false;
         for (String pasuk : this.psukimSet) {
+            if (pasuk.equals(end)) {
+                return;
+            }
             if (pasuk.equals(start)) {
                 flag = true;
             }
             if (flag) {
-                this.psukim.add(pasuk);
+                this.psukim.add(0,pasuk);
             }
-            if (pasuk.equals(end)) {
-                flag = false;
-            }
-
         }
     }
 
     public ArrayList<String> getUris() {
         for (String pasuk : this.psukim) {
-            String source=""  +" \"^"+this.sefer+" "+this.perek+" "+pasuk+"\"";
-            ResultSet results = new Queries().findUris(source);
            try{
-               String uri= ResultSetFormatter.toList(results).get(0).toString();
-                uri=uri.split("resource/")[1];
-                uri=uri.split(">")[0];
-                uri="jbr:"+uri;
-                this.uris.add(uri);
-               Dbg.dbg(Dbg.URI.id,"המרת uri הצליחה " + source);
+                getUri(pasuk);
            } catch (Exception e){
                if (xToEnd){
-                   Dbg.dbg(Dbg.URI.id,"המרת uri נכשלה, מניח שסוף פרק " + source);
+                   dbg(URI.id,"המרת uri נכשלה, מניח שסוף פרק " + source2Connvert);
                     break;
                }
-                Dbg.dbg(Dbg.ERROR.id,"המרת uri נכשלה " + source);
+                dbg(ERROR.id,"המרת uri נכשלה " + source2Connvert);
                 nErrors++;
                 if (nErrors == maxLegitErrors)
-                    Dbg.dbg(Dbg.ERROR.id,"Too many errors");
+                    dbg(ERROR.id,"Too many errors");
 
            }
         }
-
         return this.uris;
     }
 
-
-
-
+    public void getUri(String pasuk) {
+        source2Connvert = "" + " \"^" + this.sefer + " " + this.perek + " " + pasuk + "\"";
+        ResultSet results = new Queries().findUris(source2Connvert);
+        String uri = ResultSetFormatter.toList(results).get(0).toString();
+        uri = uri.split("resource/")[1];
+        uri = uri.split(">")[0];
+        uri = "jbr:" + uri;
+        this.uris.add(0,uri);
+        dbg(URI.id, "המרת uri הצליחה " + source2Connvert);
+    }
 
     public static void main(String[] args){
 
