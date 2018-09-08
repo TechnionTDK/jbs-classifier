@@ -16,6 +16,7 @@ public class RefRegex {
     static List<String> delim = Arrays.asList("(( )?),(( )?)", " ", "(( )?)(\\|)(( )?)");
     //static List<String> suffix = Arrays.asList("$", ";", ",", ".", "\\.", " ", "\\)","(\\|)",":","\\n");
     static List<String> suffix = Arrays.asList("[^א-ת\\-\"=]","$");
+    static List<String> prefix = Arrays.asList("[^א-ת]");
 
     /* create range regex of location */
     static String locationRange(String location){
@@ -83,7 +84,7 @@ public class RefRegex {
      */
 
     static String refRegexInit(String books, List<String> booksBand, List<String> pref1, String loc1, List<String> pref2, String loc2){
-        String buildRefRegex = books + "[\\']?" + orList(delim);
+        String buildRefRegex = "(?<="+prefix+")" + books + "[\\']?" + orList(delim);
         buildRefRegex += bandList(booksBand);
 
         String location = optionalList(pref1) + loc1 + orList(delim) + optionalList(pref2) + loc2;
