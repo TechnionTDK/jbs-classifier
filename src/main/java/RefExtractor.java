@@ -75,13 +75,19 @@ abstract public class RefExtractor extends Extractor {
             if (splitRange.length < 2 || splitRange[1]=="" )
                 continue;
 
-            if (splitRange[0].compareTo(splitRange[1]) > 0 ){
-                dbg(ERROR.id,"(reverse) switching");
-                dbg(FOUND.id,"from:" + ref);
-                ref = refSplit[0] + "," + refSplit[1] + ", " + splitRange[1] + "-" + splitRange[0];
-                dbg(FOUND.id,"to: " + ref);
-                cleanRefs.set(i, ref);
+            if (splitRange[1].compareTo(splitRange[0]) > 0 ){
+                if (!( splitRange[0].matches("[ט][וז]")  &&  splitRange[1].matches("[י][א-ד]?")  ))
+                    continue;
             }
+            if (   splitRange[0].matches("[י][א-ד]?")  &&  splitRange[1].matches("[ט][וז]")   )
+                continue;
+
+            if (splitRange[1].matches("[ט][וז]")  && splitRange[1].matches("[ט][א-ד]?") ) System.out.println("FAKE!!!!");
+            dbg(ERROR.id,"(reverse) switching");
+            dbg(FOUND.id,"from:" + ref);
+            ref = refSplit[0] + "," + refSplit[1] + ", " + splitRange[1] + "-" + splitRange[0];
+            dbg(FOUND.id,"to: " + ref);
+            cleanRefs.set(i, ref);
         }
     }
 
