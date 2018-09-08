@@ -16,14 +16,15 @@ abstract public class RefExtractor extends Extractor {
     /* strings to filter etc. global to all parsers*/
 
     static String locUnity = "[א-ט]";
-    static String locTens = "[י-צ&&[^ץ,^ף,^ן,^ך,^ם]]";
+    static String locTens = "[ט-צ&&[^ץ,^ף,^ן,^ך,^ם]]";
     static String locHundreds = "[ק-ת]";
     static String locAll = "[א-ת&&[^ץ,^ף,^ן,^ך,^ם]]";
     static String location = RefRegex.regexFromList(Arrays.asList(locHundreds,locTens,locUnity),
             "", "(", "[\\\"]?)?","(?=" + locAll + ")", "[\\']?");
 
 
-    //static String location = "([א-ת&&[^ץ,^ף,^ן,^ך,^ם]][\\\"]?){1,2}[\\']?";
+    //static String location = "([א-ת&&[^ץ,^ף,^ן,^ך,^ם]][\\\"]?){1,3}[\\']?";
+    //static String location = "([א-ת]){1,3}";
     static List<String> badWords = Arrays.asList("\\\'", "\\\"", "\\.", ";", "\\)", "\\(");
     static List<String> ignoredPrefSuf = Arrays.asList("\\{", "\\}", "\\[", "\\]");
     static List<String> ignoredMiddle = Arrays.asList("\\\'", "\\\"");
@@ -56,6 +57,31 @@ abstract public class RefExtractor extends Extractor {
                 ref = ref.replaceAll(entry.getKey() ,entry.getValue());
             }
             cleanRefs.set(i, getParserData().uriTagging + ref);
+        }
+    }
+
+    void switchRange(){
+        for (int i = 0; i < cleanRefs.size(); i++)
+        {
+            String ref = cleanRefs.get(i);
+
+            String[] refSplit = ref.split(",");
+            if( refSplit.length != 3){
+                dbg(ERROR.id, "Reference " + ref + "Too short\\long");
+                continue;
+            }
+
+            String[] splitRange = refSplit[2].replaceAll(" ","").split("-");
+            if (splitRange.length < 2 || splitRange[1]=="" )
+                continue;
+
+            if (splitRange[0].compareTo(splitRange[1]) > 0 ){
+                dbg(ERROR.id,"(reverse) switching");
+                dbg(FOUND.id,"from:" + ref);
+                ref = refSplit[0] + "," + refSplit[1] + ", " + splitRange[1] + "-" + splitRange[0];
+                dbg(FOUND.id,"to: " + ref);
+                cleanRefs.set(i, ref);
+            }
         }
     }
 
@@ -131,6 +157,11 @@ abstract public class RefExtractor extends Extractor {
         cleanRefs.add(rawRef);
     }
 
+    @Override
+    protected void preNormalize() {
+        dbg(FOUND.id,"רפרנסים מה" + getParserData().parserName + ":");
+    }
+
     /* For each found reference in the matcher will clean badWords, format and add to sourceList. */
     public List<String> normalize(Matcher m){
         rawRef = m.group(0);
@@ -138,6 +169,7 @@ abstract public class RefExtractor extends Extractor {
         rawRef = cleanStringsNoSpace(rawRef,badWords);
         cleanRefs.clear();
         formatReference();
+        switchRange();
         prepareURI();
         return cleanRefs;
     }
@@ -152,5 +184,3 @@ abstract public class RefExtractor extends Extractor {
         return text;
     }
 }
-
-

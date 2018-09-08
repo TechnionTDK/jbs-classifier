@@ -59,7 +59,6 @@ public class WikiPageParser {
         for (String paragraph : paragraphs) {
             dbg(INFO.id, paragraph);
             for (RefExtractor parser : parsers) {
-            dbg(FOUND.id,"רפרנסים מ: " + parser.getParserData().parserName);
             //parser.extract( "יורה דעה ק\"ג ד - קד ו" + "$;,. )|:\n");
                 List<String> refs = parser.extract(paragraph);
                 Runner.profiler.sumRestartTimer(Runner.profiler.nFetchWikiRefs, Runner.profiler.fetchWikiRefTime);

@@ -14,7 +14,7 @@ public class GmaraRefExtractor extends RefExtractor {
 
     static List<String> sheetPrefix = Arrays.asList("עמוד", "עמודים");
     static List<String> pagePrefix = Arrays.asList("דפים", "דף");
-    static String sheetRegx = "(ע([\\\"])?)?" + "([א,ב])[\\']?";
+    static String sheetRegx = "(ע([\\\"])?)?" + "([א-ב])[\\']?";
     static String URItag = "מסכת";
 
     static List<String> gmaraBooksList = Arrays.asList(

@@ -10,6 +10,10 @@ public abstract class Extractor {
         String regExp = getRegularExpression();
         Matcher m = applyRegularExpression(cleanText(text),regExp);
         List<String> finalResults = new LinkedList<String>();
+        if (m.find()){
+            preNormalize();
+            m.reset();
+        }
         while (m.find()){
             finalResults.addAll(normalize(m));
         }
@@ -23,6 +27,7 @@ public abstract class Extractor {
         return StringUtils.findRegInString(text, regExp);
     }
 
+    protected void preNormalize(){}
     public List<String> normalize(Matcher m){ return Arrays.asList(m.group(0));}
 
     protected String cleanText(String text){return text;}
