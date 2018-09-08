@@ -8,6 +8,8 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Scanner;
 
+import static java.lang.System.exit;
+
 /**
  * Created by eurocom on 27/06/2017.
  */
@@ -85,7 +87,6 @@ public class MainClass {
 			return false;
 		}
 		else if (args[0].equals("--file") || args[0].equals("-f")) {
-			allWiki = false;
 			String path="";
 			if (args.length <= currArg || args[currArg].equals("--dbg")) {
 				System.out.println("\nNo file mentioned, using default - topics.in \n");
@@ -100,7 +101,6 @@ public class MainClass {
 			}
 		}
 		else if (args[0].equals("--test") || args[0].equals("-t")) {
-			allWiki = false;
 			String path="";
 			if (args.length <= currArg || args[currArg].equals("--dbg")) {
 				System.out.println("\nNo file mentioned, using default - test.in \n");
@@ -151,12 +151,15 @@ public class MainClass {
 		System.out.println("\nParsing following wiki pages from file \'" + fileName + "\':");
 		while (inFile.hasNext()) {
 			String newTitle = inFile.nextLine();
+			newTitle = newTitle.trim();
+			if (!newTitle.matches("^[א-ת0-9a-zA-Z]" + ".*")) {
+				continue;
+			}
 			titles.add(newTitle);
-			System.out.println(newTitle);
+			System.out.println("*" + newTitle + "*");
 		}
 		System.out.println("");
 		inFile.close();
-		allWiki = false;
 		return true;
 	}
 
@@ -178,13 +181,18 @@ public class MainClass {
 	static class DumpArticleFilter implements IArticleFilter {
 		public void process(WikiArticle page, Siteinfo info) throws IOException {
 			try {
-				if ( titles.isEmpty() || titles.contains(page.getTitle()) )
+				if ( allWiki || titles.contains(page.getTitle()) ) {
+					titles.remove(page.getTitle());
 					new Runner(page).run();
+				}
 			} catch (Exception e) {
 				System.out.println("WE SHOULD NOT GET HERE!!!! \n");
 				e.printStackTrace();
 			}
-			return;
+			if (!allWiki && titles.isEmpty()) {
+				System.out.println("\n\nFinished scanning all topics. \nOutputs added to files with Timestamp " + Runner.ts + "\n\n");
+				exit(0);
+			}
 		}
 	}
 }
