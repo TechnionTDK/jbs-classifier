@@ -36,13 +36,13 @@ fi
 echo -e "\nfetched wikis: $wikis \n"
 
 echo "run time: $minTime min = $hrTime hr and $hrMinTime min"
-echo "mili per wiki page: $milPerPage"
+echo "millie per wiki page: $milPerPage"
 echo -e "expected remaining: $expecRemain min = $expecRemainH hr and $expecRemainHM min\n"
 
-echo "tanach refs: $tanachRefs (uniq: $tanachUniq)"
-echo "gmara refs: $gmaraRefs (uniq: $gmaraUniq)"
-echo "rambam refs: $rambamRefs (uniq: $rambamUniq)"
-echo "halacha refs: $halachaRefs (uniq: $halachaUniq)"
+echo "tanach refs: $tanachRefs (unique: $tanachUniq)"
+echo "gmara refs: $gmaraRefs (unique: $gmaraUniq)"
+echo "rambam refs: $rambamRefs (unique: $rambamUniq)"
+echo "halacha refs: $halachaRefs (unique: $halachaUniq)"
 echo -e "found wikis: $matchingWikis \n"
 
 if [[ $output == "" ]]; then
