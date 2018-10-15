@@ -1,0 +1,57 @@
+#!/bin/bash
+
+output=$2
+statsDir=$1
+totWikis=524867
+
+wikis=`grep -m1 fetched "$statsDir/profiler" | cut -d' ' -f3`
+milTime=`grep -m1 total "$statsDir/profiler" | cut -d' ' -f3`
+minTime=$(($milTime/60000))
+hrTime=$(($minTime/60))
+hrMinTime=$(($minTime%60))
+milPerPage=$(($milTime/wikis))
+expecRemain=$(( (($totWikis-$wikis)*$milPerPage)/60000 ))
+expecRemainH=$(($expecRemain/60))
+expecRemainHM=$(($expecRemain%60))
+
+tanachRefs=`grep "jbr:text-tanach" "$statsDir/pages_uri" | wc -l`
+tanachUniq=`grep "jbr:text-tanach" "$statsDir/pages_uri" | sort | uniq | wc -l`
+gmaraRefs=`grep "jbr:text-bavli" "$statsDir/pages_uri" | wc -l`
+gmaraUniq=`grep "jbr:text-bavli" "$statsDir/pages_uri" | sort | uniq | wc -l`
+rambamRefs=`grep "jbr:text-mishnetorah" "$statsDir/pages_uri" | wc -l`
+rambamUniq=`grep "jbr:text-mishnetorah" "$statsDir/pages_uri" | sort | uniq | wc -l`
+halachaRefs=`grep "jbr:text-shulchanaruch" "$statsDir/pages_uri" | wc -l`
+halachaUniq=`grep "jbr:text-shulchanaruch" "$statsDir/pages_uri" | sort | uniq | wc -l`
+matchingWikis=`cat "$statsDir/pages_with_uri" | sort | uniq | wc -l`
+
+if [[ $output != "" ]]; then
+	tooMany=`grep  "Too many" $output | wc -l`
+	failConv=`grep  "uri" $output | wc -l`
+	failRate=$(($wikis/$failConv))
+
+	badRange=`grep "Range Too large" $output | wc -l`
+	reversRange=`grep "reverse" $output | wc -l`
+fi
+
+echo -e "\nfetched wikis: $wikis \n"
+
+echo "run time: $minTime min = $hrTime hr and $hrMinTime min"
+echo "millie per wiki page: $milPerPage"
+echo -e "expected remaining: $expecRemain min = $expecRemainH hr and $expecRemainHM min\n"
+
+echo "tanach refs: $tanachRefs (unique: $tanachUniq)"
+echo "gmara refs: $gmaraRefs (unique: $gmaraUniq)"
+echo "rambam refs: $rambamRefs (unique: $rambamUniq)"
+echo "halacha refs: $halachaRefs (unique: $halachaUniq)"
+echo -e "found wikis: $matchingWikis \n"
+
+if [[ $output == "" ]]; then
+	exit
+fi
+echo "Too Many error: $tooMany"
+echo "fail conversions: $failConv"
+echo -e "fail conversions rate: 1/$failRate pages\n"
+
+echo "ranges out of bound: $badRange"
+echo -e "revers ranges: $reversRange \n"
+

@@ -2,13 +2,12 @@
 .idea/workspace.xml
 *.iml
 *.iws
-*.json
 *.dbg
 log/
 target/
 out/
-stat*/
-outputs/
+./stat*/
+./outputs/
 hewiki-20160203-pages-articles.xml
 Output.json
 
