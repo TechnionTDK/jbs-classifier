@@ -56,7 +56,7 @@ public class Runner implements Runnable {
             /* Parsing wiki page */
             newWiki.parsePage();
             profiler.sumRestartTimer(profiler.nProcWikiPages, profiler.procWikiTotalTime);
-            jt = new JsonTuple("http://en.wikipedia.org/?curid=" + pageId, newWiki.pageTitle);
+            jt = new JsonTuple("http://he.wikipedia.org/?curid=" + pageId, newWiki.pageTitle);
             FileWriter allPages = new FileWriter(statDir + "all_pages", true);
             allPages.write(newWiki.pageTitle + "\n");
             allPages.close();
@@ -185,7 +185,7 @@ public class Runner implements Runnable {
     static void writeJsonTuple(JsonTuple jTuple) throws Exception {
 
         jList.addJsonTuple(jTuple);
-        Gson gson = new GsonBuilder().setPrettyPrinting().create();
+        Gson gson = new GsonBuilder().disableHtmlEscaping().setPrettyPrinting().create();
         String jString = gson.toJson(jList);
         gson.toJson(jString);
         FileWriter writer = new FileWriter("outputs/" + ts + ".json", false);
