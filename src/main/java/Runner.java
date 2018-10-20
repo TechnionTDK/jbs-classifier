@@ -26,10 +26,10 @@ public class Runner implements Runnable {
     String pageId;
     WikiPageParser newWiki;
     JsonTuple jt;
-    static SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy.MM.dd_HH.mm.ss.SSS");
+    static SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy.MM.dd_HH.mm.ss");
     static String ts = dateFormat.format(new Date());
     //static long ts=new Date().getTime();
-    static String statDir="stats/"+ts+"/";
+    static String resDir ="results/"+ts+"/";
 
     /* stats file */
     FileWriter pagesUri;
@@ -38,7 +38,7 @@ public class Runner implements Runnable {
 
     public Runner(WikiArticle page) throws Exception {
 
-        new File(statDir).mkdirs();
+        new File(resDir).mkdirs();
         new File("outputs/").mkdirs();
         this.pageId = page.getId();
         try {
@@ -57,7 +57,7 @@ public class Runner implements Runnable {
             newWiki.parsePage();
             profiler.sumRestartTimer(profiler.nProcWikiPages, profiler.procWikiTotalTime);
             jt = new JsonTuple("http://he.wikipedia.org/?curid=" + pageId, newWiki.pageTitle);
-            FileWriter allPages = new FileWriter(statDir + "all_pages", true);
+            FileWriter allPages = new FileWriter(resDir + "all_pages", true);
             allPages.write(newWiki.pageTitle + "\n");
             allPages.close();
 
@@ -93,15 +93,14 @@ public class Runner implements Runnable {
         }
         if (noRefs) return;
 
-        FileWriter refsPages = new FileWriter(statDir + "pages_with_refs", true);
+        FileWriter refsPages = new FileWriter(resDir + "pages_with_refs", true);
         refsPages.write(newWiki.pageTitle + "\n");
         refsPages.close();
 
-        pageRefs = new FileWriter(statDir + "pages_refs", true);
-        pagesUri = new FileWriter(statDir + "pages_uri", true);
+        pageRefs = new FileWriter(resDir + "pages_refs", true);
+        pagesUri = new FileWriter(resDir + "pages_uri", true);
         pageRefs.write(newWiki.pageTitle + ":\n");
-        
-                            profiler.restartTimer();
+        profiler.restartTimer();
         UriConverter.nErrors=0;
 
         for (RefExtractor parser : newWiki.parsers)
@@ -120,7 +119,7 @@ public class Runner implements Runnable {
                 ArrayList<String> uris = new UriConverter(reference.fullRef).getUris();
                 if(!uris.isEmpty() && uriExist==0){
                     uriExist=1;
-                    FileWriter uriPages = new FileWriter(statDir + "pages_with_uri", true);
+                    FileWriter uriPages = new FileWriter(resDir + "pages_with_uri", true);
                     uriPages.write(newWiki.pageTitle + "\n");
                     uriPages.close();
                     pagesUri.write(newWiki.pageTitle + ":\n");
@@ -150,7 +149,7 @@ public class Runner implements Runnable {
         sumTimers += profiler.writeToFileTime.longValue();
 
         long totTime = new Date().getTime() - profiler.startRunTime;
-        FileWriter profilerFile = new FileWriter(statDir + "profiler", false);
+        FileWriter profilerFile = new FileWriter(resDir + "profiler", false);
         profilerFile.write(
                 // constructor should be nothing
                 "fetch wiki time: " + profiler.fetchWikiTotalTime.longValue() +
@@ -188,7 +187,7 @@ public class Runner implements Runnable {
         Gson gson = new GsonBuilder().disableHtmlEscaping().setPrettyPrinting().create();
         String jString = gson.toJson(jList);
         gson.toJson(jString);
-        FileWriter writer = new FileWriter("outputs/" + ts + ".json", false);
+        FileWriter writer = new FileWriter(resDir + "result.json", false);
         writer.write(jString);
         writer.close();
     }
