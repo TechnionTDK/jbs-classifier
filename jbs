@@ -1,0 +1,146 @@
+#!/bin/bash
+
+LOCKDIR=/dev/shm/jbslock
+
+monitor(){
+	#output=$2
+	statsDir=$1
+	output=$statsDir/res.out
+	totWikis=524867
+
+	wikis=`grep -m1 fetched "$statsDir/profiler" | cut -d' ' -f3`
+	milTime=`grep -m1 total "$statsDir/profiler" | cut -d' ' -f3`
+	minTime=$(($milTime/60000))
+	hrTime=$(($minTime/60))
+	hrMinTime=$(($minTime%60))
+	milPerPage=$(($milTime/wikis))
+	expecRemain=$(( (($totWikis-$wikis)*$milPerPage)/60000 ))
+	expecRemainH=$(($expecRemain/60))
+	expecRemainHM=$(($expecRemain%60))
+
+	tanachRefs=`grep "jbr:text-tanach" "$statsDir/pages_uri" | wc -l`
+	tanachUniq=`grep "jbr:text-tanach" "$statsDir/pages_uri" | sort | uniq | wc -l`
+	gmaraRefs=`grep "jbr:text-bavli" "$statsDir/pages_uri" | wc -l`
+	gmaraUniq=`grep "jbr:text-bavli" "$statsDir/pages_uri" | sort | uniq | wc -l`
+	rambamRefs=`grep "jbr:text-mishnetorah" "$statsDir/pages_uri" | wc -l`
+	rambamUniq=`grep "jbr:text-mishnetorah" "$statsDir/pages_uri" | sort | uniq | wc -l`
+	halachaRefs=`grep "jbr:text-shulchanaruch" "$statsDir/pages_uri" | wc -l`
+	halachaUniq=`grep "jbr:text-shulchanaruch" "$statsDir/pages_uri" | sort | uniq | wc -l`
+	matchingWikis=`cat "$statsDir/pages_with_uri" | sort | uniq | wc -l`
+
+	if [[ -e $output ]]; then
+		tooMany=`grep  "Too many" $output | wc -l`
+		failConv=`grep  "uri" $output | wc -l`
+		failRate=0
+		if [[ $failConv != 0 ]]; then
+			failRate=$(($wikis/$failConv))
+		fi
+		badRange=`grep "Range Too large" $output | wc -l`
+		reversRange=`grep "reverse" $output | wc -l`
+	fi
+
+	echo -e "\nfetched wikis: $wikis \n"
+
+	echo "run time: $minTime min = $hrTime hr and $hrMinTime min"
+	echo "millie per wiki page: $milPerPage"
+	echo -e "expected remaining: $expecRemain min = $expecRemainH hr and $expecRemainHM min\n"
+
+	echo "tanach refs: $tanachRefs (unique: $tanachUniq)"
+	echo "gmara refs: $gmaraRefs (unique: $gmaraUniq)"
+	echo "rambam refs: $rambamRefs (unique: $rambamUniq)"
+	echo "halacha refs: $halachaRefs (unique: $halachaUniq)"
+	echo -e "found wikis: $matchingWikis \n"
+
+	if [[ ! -e $output ]]; then
+		exit
+	fi
+	echo "Too Many error: $tooMany"
+	echo "fail conversions: $failConv"
+	if [[ $failRate != 0 ]]; then
+		echo -e "fail conversions rate: 1/$failRate pages\n"
+	fi
+	echo "ranges out of bound: $badRange"
+	echo -e "revers ranges: $reversRange \n"
+}
+
+
+run(){
+	java -cp target/jbs-classifier-1.0-SNAPSHOT-jar-with-dependencies.jar MainClass $@
+}
+
+monitor_running(){
+	echo -e "using timestamp $TS \n" 
+	monitor "results/$TS"
+	wait 
+}
+
+start(){
+        if [[ -e $LOCKDIR ]]; then
+                echo "jbs start already running"
+                return
+        fi
+        trap ':' HUP
+        mypid=$(bash -c 'echo $PPID')
+        TS=$(date +%Y.%m.%d_%H.%M.%S)
+        echo "Using timestamp $TS"
+        mkdir -p results/$TS
+	java -cp target/jbs-classifier-1.0-SNAPSHOT-jar-with-dependencies.jar MainClass --all $@ >& results/$TS/res.out &
+	pid=$!
+        trap "rm -rf $LOCKDIR; kill -9 $pid" TERM
+	trap monitor_running USR1
+        mkdir -p $LOCKDIR
+        touch $LOCKDIR/$mypid
+        wait
+        rm -rf $LOCKDIR
+
+}
+
+stop(){
+        if [[ ! -e $LOCKDIR ]]; then
+                echo "jbs was not started"
+                return
+        fi
+        pid=$(ls $LOCKDIR)
+        kill -TERM $pid
+}
+
+status(){
+        if [[ ! -e $LOCKDIR ]]; then
+                echo "jbs was not started"
+                return
+        fi
+        pid=$(ls $LOCKDIR)
+        kill -USR1 $pid
+}
+
+case "$1" in
+'monitor'|'-m')
+	shift
+	monitor $@ 
+	;;
+'run'|'-r')
+	shift
+	run $@
+	;;
+'start')
+	shift
+	start $@ &
+	;;
+'stop')
+	stop
+	;;
+'status')
+	status
+	;;
+'build'|'-b')
+	mvn clean install
+	;;
+'update'|'-u')
+	git pull
+	mvn clean install
+	;;	
+*)
+	echo "Usage: $0 [monitor -m|run -r|run2out -ro|build -b|update -u]"
+	echo "to see run different options use: $0 run --help"
+	;;
+esac
