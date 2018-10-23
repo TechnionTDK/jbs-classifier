@@ -1,0 +1,28 @@
+fetch wiki time: 350
+fetched wikis: 524867
+
+process time: 104
+processed pages: 524864
+
+fetch title: 11987
+titles fetched: 524865
+
+fetch paragraphs time: 13871
+paragraph fetches: 524865
+
+fetch Refs time: 4204878
+refs fetches: 56751455
+
+process refs time: 2599
+refs processes: 56751454
+
+convert time: 34731671
+converted pages: 524864
+
+write to file time: 1858338
+writings to file: 6202
+
+rest of the time: 466162
+
+timers sum: 41289960
+total time: 41294398
