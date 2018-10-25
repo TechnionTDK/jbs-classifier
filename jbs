@@ -113,6 +113,24 @@ status(){
         kill -USR1 $pid
 }
 
+usage(){
+	echo "Usage: jbs <option>" 
+	echo ""
+	echo "Following options are available:"
+	echo ""
+	echo "run|-r      [classifier flags]    -  run the classifier with provided flags."
+	echo "monitor|-m  [result folder]       -  print result summary." 
+	echo "start       [classifier flags]    -  running classifier on all wikipedia on background."
+	echo "                                     output is saved to res.out in the results folder."
+	echo "stop                              -  stop started classifier."
+	echo "status                            -  print current started classifier resault summery."
+	echo "build|-b                          -  build the classifier."
+	echo "update|-u                         -  update the classifier code."
+	echo ""
+	echo "To see classifier different options run: $0 run --help"
+	echo ""
+}
+
 case "$1" in
 'monitor'|'-m')
 	shift
@@ -140,7 +158,7 @@ case "$1" in
 	mvn clean install
 	;;	
 *)
-	echo "Usage: $0 [monitor -m|run -r|run2out -ro|build -b|update -u]"
-	echo "to see run different options use: $0 run --help"
+	echo -e "Unrecogized option\n"
+	usage
 	;;
 esac
