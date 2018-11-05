@@ -37,7 +37,6 @@ public class Runner implements Runnable {
 
 
     public Runner(WikiArticle page) throws Exception {
-
         new File(resDir).mkdirs();
         new File("outputs/").mkdirs();
         this.pageId = page.getId();
@@ -49,6 +48,11 @@ public class Runner implements Runnable {
         } catch (Exception e) {
             return;
         }
+    }
+
+    static public void setTS(String externalTS) throws Exception {
+        ts=externalTS;
+        resDir ="results/"+ts+"/";
     }
 
     public void run(){

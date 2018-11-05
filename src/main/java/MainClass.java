@@ -17,12 +17,14 @@ public class MainClass {
 
 	static boolean allWiki = false;
 	static WikiArticle testwiki=null;
-	static Scanner in = new Scanner(System.in);
 	static ArrayList<String> titles = new ArrayList<String>();
+	static String inTS="";
 
 	public static void main(String[] args) throws Exception {
 		if (!readArguments(args))
 			return;
+		if (!inTS.equals(""))
+			Runner.setTS(inTS);
 		if (allWiki || !titles.isEmpty())
 			processWikis();
 		else if (testwiki!=null){
@@ -41,11 +43,13 @@ public class MainClass {
 		}
 		System.out.println("Without any option (or only dbg flag) interactive mode will be used.\n");
 
-		System.out.println("-a, --all                       Start Wikipedia full scan (scan all pages).\n" +
-				  		   "                                This option cannot be combined with -f/--file.");
-		System.out.println("-f, --file <files>              Scan specific Wikipedia pages.\n" +
-						   "                                Pages URLs should be provided in the added files\n" +
-						   "                                This option cannot be combined with -a/--all");
+		System.out.println("-a, --all                       Start Wikipedia full scan (scan all pages).\n");
+		System.out.println("-f, --file <file>               Scan specific Wikipedia pages.\n" +
+						   "                                Pages topic should be provided in the added file\n" +
+						   "                                Using \'topics.in\' as default file\n");
+		System.out.println("-t, --test <file>               Scan a file emulating a Wikipedia page.\n" +
+						   "                                Using \'test.in\' as default file\n");
+		System.out.println("-T, --time <timestamp>          Provide timestamp used for the output folder.\n" );
 		System.out.println("-h, --help                      Print this message");
 		System.out.println("-d, --dbg <debug flags>         Specify which debug flags to enable.");
 		System.out.println("                                PAGE and ERROR are enabled by default.");
@@ -88,7 +92,7 @@ public class MainClass {
 		}
 		else if (args[0].equals("--file") || args[0].equals("-f")) {
 			String path="";
-			if (args.length <= currArg || args[currArg].equals("--dbg")) {
+			if (args.length <= currArg || args[currArg].equals("--dbg") || args[currArg].equals("-T") || args[currArg].equals("--time")) {
 				System.out.println("\nNo file mentioned, using default - topics.in \n");
 				path="topics.in";
 			} else {
@@ -102,7 +106,7 @@ public class MainClass {
 		}
 		else if (args[0].equals("--test") || args[0].equals("-t")) {
 			String path="";
-			if (args.length <= currArg || args[currArg].equals("--dbg")) {
+			if (args.length <= currArg || args[currArg].equals("--dbg") || args[currArg].equals("-T") || args[currArg].equals("--time")) {
 				System.out.println("\nNo file mentioned, using default - test.in \n");
 				path="test.in";
 			} else {
@@ -117,7 +121,18 @@ public class MainClass {
 			usageMsg(false, "\nUnknown argument: " + args[0] + "\n");
 			return false;
 		}
+		if (args.length <= currArg)
+			return true;
 
+		if (args[currArg].equals("--time") || args[currArg].equals("-T")) {
+			currArg++;
+			if (args.length <= currArg || args[currArg].equals("--dbg") ) {
+				System.out.println("\nNo timestamp provided, timestamp will be calculated automaticly\n");
+			} else {
+				inTS = args[currArg];
+				currArg++;
+			}
+		}
 		if (args.length <= currArg)
 			return true;
 
@@ -163,8 +178,7 @@ public class MainClass {
 		return true;
 	}
 
-
-   static void processWikis(){
+	static void processWikis(){
 	   String Filename = "hewiki-20160203-pages-articles.xml";
 	   try {
 		   IArticleFilter handler = new DumpArticleFilter();
@@ -176,7 +190,6 @@ public class MainClass {
 	   }
 	   System.out.println("\n\nPage Scan finished. \nOutputs added to files with Timestamp " + Runner.ts + "\n\n");
    }
-
 
 	static class DumpArticleFilter implements IArticleFilter {
 		public void process(WikiArticle page, Siteinfo info) throws IOException {
