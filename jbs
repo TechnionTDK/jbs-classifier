@@ -84,7 +84,7 @@ start(){
         TS=$(date +%Y.%m.%d_%H.%M.%S)
         echo "Using timestamp $TS"
         mkdir -p results/$TS
-	java -cp target/jbs-classifier-1.0-SNAPSHOT-jar-with-dependencies.jar MainClass --all $@ >& results/$TS/res.out &
+	java -cp target/jbs-classifier-1.0-SNAPSHOT-jar-with-dependencies.jar MainClass --all -T $TS $@ >& results/$TS/res.out &
 	pid=$!
         trap "rm -rf $LOCKDIR; kill -9 $pid" TERM
 	trap monitor_running USR1
