@@ -2,7 +2,6 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
 import java.io.File;
-import java.io.FileWriter;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Date;
@@ -10,39 +9,55 @@ import java.text.SimpleDateFormat;
 
 import info.bliki.wiki.dump.*;
 import static utils.Dbg.*;
+import static utils.StringUtils.writeToFile;
 
-//import utils.StringUtils;
 
 /**
  * Created by netanel on 26/06/2017.
  * Represent a thread dedicated to process a specific wiki page.
- * initialized with the Wiki page url and the global profiler object.
+ * Initialized with the Wiki page.
  */
 
 public class Runner implements Runnable {
-    static Profiler profiler = new Profiler();
     int uriExist=0;
-    static JsonList jList = new JsonList();
     String pageId;
     WikiPageParser newWiki;
     JsonTuple jt;
-    static SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy.MM.dd_HH.mm.ss");
-    static String ts = dateFormat.format(new Date());
-    //static long ts=new Date().getTime();
-    static String resDir ="results/"+ts+"/";
 
+    static JsonList jList = new JsonList();
+    static Profiler profiler = new Profiler();
+
+    static String ts;
+    static String resDir;
     /* stats file */
-    FileWriter pagesUri;
-    FileWriter pageRefs;
+    static String pagesUri;
+    static String pageRefs;
+    static String allPages;
+    static String refsPages;
+    static String uriPages;
+
+    /* set static params - timestamp and files*/
+    static public void setTS(String externalTS) throws Exception {
+        if (externalTS.equals("")){
+            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy.MM.dd_HH.mm.ss");
+            ts = dateFormat.format(new Date());
+        } else {
+            ts=externalTS;
+        }
+        resDir ="results/"+ts+"/";
+        new File(resDir).mkdirs();
+        allPages = resDir + "all_pages";
+        refsPages = resDir + "pages_with_refs";
+        pageRefs = resDir + "pages_refs";
+        pagesUri = resDir + "pages_uri";
+        uriPages = resDir + "pages_with_uri";
+    }
 
 
     public Runner(WikiArticle page) throws Exception {
-        new File(resDir).mkdirs();
-        new File("outputs/").mkdirs();
         this.pageId = page.getId();
         try {
             profiler.restartTimer();
-            /* Fetching wiki page */
             newWiki = new WikiPageParser(page);
             profiler.sumRestartTimer(profiler.nFetchWiki, profiler.fetchWikiTotalTime);
         } catch (Exception e) {
@@ -50,26 +65,27 @@ public class Runner implements Runnable {
         }
     }
 
-    static public void setTS(String externalTS) throws Exception {
-        ts=externalTS;
-        resDir ="results/"+ts+"/";
-    }
-
+    /* Wrapper for wiki page processing stages.
+     * Stages:
+     *      Parsing wiki page
+     *      Converting found reference to URIs and adding to JsonTuple
+     *      Updating profiler information
+     *      Saving JsonTuple to json file
+     * During execution statistics are collected and save to the stats files.
+     */
     public void run(){
         try {
             /* Parsing wiki page */
             newWiki.parsePage();
             profiler.sumRestartTimer(profiler.nProcWikiPages, profiler.procWikiTotalTime);
-            jt = new JsonTuple("http://he.wikipedia.org/?curid=" + pageId, newWiki.pageTitle);
-            FileWriter allPages = new FileWriter(resDir + "all_pages", true);
-            allPages.write(newWiki.pageTitle + "\n");
-            allPages.close();
+            writeToFile(allPages, newWiki.pageTitle);
 
             /* Converting found reference to URIs and adding to JsonTuple */
+            jt = new JsonTuple("http://he.wikipedia.org/?curid=" + pageId, newWiki.pageTitle);
             handelSourceLists();
             profiler.sumRestartTimer(profiler.numConverts, profiler.convUriTotalTime);
 
-            /* writing updated profiler information to file */
+            /* Writing updated profiler information to file */
             writeProfiler();
 
 	        if(jt.mentions.isEmpty())
@@ -86,9 +102,10 @@ public class Runner implements Runnable {
         }
     }
 
-
+    /* Converting all wiki page found reference to URIs and adding to JsonTuple */
     public void handelSourceLists() throws Exception {
         boolean noRefs =  true;
+        /* first check if any refs exist in wiki page */
         for (RefExtractor parser : newWiki.parsers){
             if (!parser.parserRefs.isEmpty()){
                 noRefs = false;
@@ -96,42 +113,36 @@ public class Runner implements Runnable {
             }
         }
         if (noRefs) return;
+        writeToFile(refsPages, newWiki.pageTitle);
+        writeToFile(pageRefs,newWiki.pageTitle + ":");
 
-        FileWriter refsPages = new FileWriter(resDir + "pages_with_refs", true);
-        refsPages.write(newWiki.pageTitle + "\n");
-        refsPages.close();
-
-        pageRefs = new FileWriter(resDir + "pages_refs", true);
-        pagesUri = new FileWriter(resDir + "pages_uri", true);
-        pageRefs.write(newWiki.pageTitle + ":\n");
+        /* Iterate parsers, all parser's refs are converted to URIs and added to the JsonTuple */
         profiler.restartTimer();
         UriConverter.nErrors=0;
-
         for (RefExtractor parser : newWiki.parsers)
             sourceList2URIs(parser.parserRefs);
-
-        pagesUri.close();
-        pageRefs.close();
     }
 
-
+    /* All refs in the ref list are converted to URIs and added to the JsonTuple */
     public void sourceList2URIs(List<Reference> referenceList) throws Exception {
         for(Reference reference : referenceList){
             dbg(FINAL.id, reference.fullRef);
-            pageRefs.write(reference.fullRef + "\n");
+            writeToFile(pageRefs,reference.fullRef);
             try {
                 ArrayList<String> uris = new UriConverter(reference.fullRef).getUris();
+
+                /* First URI for wiki page */
                 if(!uris.isEmpty() && uriExist==0){
                     uriExist=1;
-                    FileWriter uriPages = new FileWriter(resDir + "pages_with_uri", true);
-                    uriPages.write(newWiki.pageTitle + "\n");
-                    uriPages.close();
-                    pagesUri.write(newWiki.pageTitle + ":\n");
+                    writeToFile(uriPages, newWiki.pageTitle);
+                    writeToFile(pagesUri,newWiki.pageTitle + ":");
                 }
+
+                /* Add each uris to a mentions tuple later merged into the JsonTuple */
                 ArrayList<MentionsTuple> mts = new ArrayList<MentionsTuple>();
                 for (String uri : uris) {
                     dbg(URI.id, uri);
-                    pagesUri.write(uri + "\n");
+                    writeToFile(pagesUri,uri);
                     MentionsTuple mentionsTuple = new MentionsTuple(uri, reference.paragraph, reference.fullRef);
                     mts.add(mentionsTuple);
                 }
@@ -140,7 +151,7 @@ public class Runner implements Runnable {
         }
     }
 
-
+    /* Write updated profile information to the stat file */
     void writeProfiler() throws Exception {
         long sumTimers = profiler.otherTotalTime;
         sumTimers += profiler.procWikiTotalTime.longValue();
@@ -153,8 +164,7 @@ public class Runner implements Runnable {
         sumTimers += profiler.writeToFileTime.longValue();
 
         long totTime = new Date().getTime() - profiler.startRunTime;
-        FileWriter profilerFile = new FileWriter(resDir + "profiler", false);
-        profilerFile.write(
+        writeToFile(resDir + "profiler",
                 // constructor should be nothing
                 "fetch wiki time: " + profiler.fetchWikiTotalTime.longValue() +
                 "\nfetched wikis: " + profiler.nFetchWiki.intValue() +
@@ -181,18 +191,16 @@ public class Runner implements Runnable {
                 "\nwritings to file: " + profiler.numFileWrite.intValue() +
 
                 "\n\nrest of the time: " + profiler.otherTotalTime +
-                "\n\ntimers sum: " + sumTimers + "\ntotal time: " + totTime);
-        profilerFile.close();
+                "\n\ntimers sum: " + sumTimers + "\ntotal time: " + totTime,
+                false);
     }
 
+    /* Write JsonTuple to Json file */
     static void writeJsonTuple(JsonTuple jTuple) throws Exception {
-
         jList.addJsonTuple(jTuple);
         Gson gson = new GsonBuilder().disableHtmlEscaping().setPrettyPrinting().create();
         String jString = gson.toJson(jList);
         gson.toJson(jString);
-        FileWriter writer = new FileWriter(resDir + "result.json", false);
-        writer.write(jString);
-        writer.close();
+        writeToFile(resDir + "result.json", jString, false);
     }
 }

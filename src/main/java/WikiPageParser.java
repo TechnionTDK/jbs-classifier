@@ -1,4 +1,3 @@
-//import com.sun.deploy.util.BlackList;
 
 import info.bliki.wiki.dump.*;
 import static utils.Dbg.*;
@@ -9,24 +8,16 @@ import java.util.List;
 
 /**
  * Created by eurocom on 12/05/2017.
- * WikiPageParser - main class to fetch wiki pages and parse them.
- * parsing will find page topic, categories, main Tanach book if possible, and all Tanach\Gmara references.
+ * WikiPageParser - main class to parse wiki pages.
+ * parsing will find page topic, categories and registered parser references.
  */
 
 public class WikiPageParser {
-
     WikiArticle wikiPage;
-
     List<String> categoriesList = new LinkedList<String>();
-    String mainBook;
     String pageTitle;
-
     List<RefExtractor> parsers=new LinkedList<RefExtractor>();
 
-    //static String allBooks = "(" + RefRegex.booksInit(TanachRefExtractor.tanachBooksList) + "|" + RefRegex.booksInit(GmaraRefExtractor.gmaraBooksList) + ")";
-
-
-    /**************************************  topic + main book  ********************************************/
 
     WikiPageParser(WikiArticle page) throws IOException, InterruptedException {
         wikiPage=page;
@@ -38,7 +29,7 @@ public class WikiPageParser {
         parsers.add(new HalachaRefExtractor());
     }
 
-    /* Set Wiki page topic */
+    /* Set Wiki page title */
     void setPageTitle(){
         pageTitle = wikiPage.getTitle();
         dbg(ANY.id, "\nנושא: " + pageTitle);
@@ -53,13 +44,12 @@ public class WikiPageParser {
     void findReferences(){
 
         String[] paragraphs = wikiPage.getText().split("[\n]");
-        //List<String> paragraphs = new ParagraphExtractor(TanachRefExtractor.tanachRefRegex).extract(wikiPage.getText());
         Runner.profiler.sumRestartTimer(Runner.profiler.nFetchWikiParagraphs, Runner.profiler.fetchWikiParagraphsTime);
 
+        /* Iterate paragraphs, for each paragraphs run all parsers and add the found references to parser references list */
         for (String paragraph : paragraphs) {
             dbg(INFO.id, paragraph);
             for (RefExtractor parser : parsers) {
-            //parser.extract( "יורה דעה ק\"ג ד - קד ו" + "$;,. )|:\n");
                 List<String> refs = parser.extract(paragraph);
                 Runner.profiler.sumRestartTimer(Runner.profiler.nFetchWikiRefs, Runner.profiler.fetchWikiRefTime);
                 for (String ref : refs)

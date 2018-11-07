@@ -5,6 +5,13 @@ import java.util.List;
 import java.util.Arrays;
 import java.util.regex.Matcher;
 
+/* For a given text preform:
+          - cleanText.
+          - applyRegularExpression using return of getRegularExpression.
+          - preNormalize.
+          - normalize on each matched string (may return 2 strings).
+          - return all the results.
+*/
 public abstract class Extractor {
     List<String> extract(String text){
         String regExp = getRegularExpression();

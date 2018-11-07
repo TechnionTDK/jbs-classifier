@@ -10,7 +10,7 @@ import java.util.Scanner;
 
 import static java.lang.System.exit;
 
-/**
+/*
  * Created by eurocom on 27/06/2017.
  */
 public class MainClass {
@@ -23,8 +23,7 @@ public class MainClass {
 	public static void main(String[] args) throws Exception {
 		if (!readArguments(args))
 			return;
-		if (!inTS.equals(""))
-			Runner.setTS(inTS);
+		Runner.setTS(inTS);
 		if (allWiki || !titles.isEmpty())
 			processWikis();
 		else if (testwiki!=null){
@@ -178,6 +177,9 @@ public class MainClass {
 		return true;
 	}
 
+	/* Iterating the wikipedia dump pages.
+	 * Each wiki page is passed for process to the provided IArticleFilter handler
+	 */
 	static void processWikis(){
 	   String Filename = "hewiki-20160203-pages-articles.xml";
 	   try {
@@ -191,6 +193,8 @@ public class MainClass {
 	   System.out.println("\n\nPage Scan finished. \nOutputs added to files with Timestamp " + Runner.ts + "\n\n");
    }
 
+   /* When provided to the bliki WikiXMLParser as handler, process function will be called for each Wiki page.
+    */
 	static class DumpArticleFilter implements IArticleFilter {
 		public void process(WikiArticle page, Siteinfo info) throws IOException {
 			try {

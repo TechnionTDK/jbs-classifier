@@ -1,5 +1,7 @@
 package utils;
 
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.LinkedList;
@@ -42,12 +44,12 @@ public class StringUtils {
         return  cleanStringsSpace(text, Arrays.asList("(?i)[\\s]+"));
     }
 
-    /* remove all strings in badWords from reference string */
-    public static String cleanWords(String reference, List<String> badWords) {
+    /* remove all strings in badWords from str */
+    public static String cleanWords(String str, List<String> badWords) {
         for (String badWord : badWords) {
-            reference = reference.replaceAll("(?i)[\\s]+" + badWord + "(?i)[\\s]+", " ");
+            str = str.replaceAll("(?i)[\\s]+" + badWord + "(?i)[\\s]+", " ");
         }
-        return reference;
+        return str;
     }
 
 
@@ -60,5 +62,15 @@ public class StringUtils {
             foundStrings.add(matcher.group(1));
         }
         return  foundStrings;
+    }
+
+    public static void writeToFile(String filename, String str, Boolean append) throws IOException {
+        FileWriter file = new FileWriter(filename, append);
+        file.write(str + "\n");
+        file.close();
+    }
+
+    public static void writeToFile(String filename, String str) throws IOException {
+        writeToFile(filename,str,true);
     }
 }

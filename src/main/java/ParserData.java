@@ -2,6 +2,7 @@ import java.util.*;
 
 /**
  * Created by eurocom on 19/05/2018.
+ * Hold required parser unique (static) data.
  */
 public class ParserData {
     String parserName;
@@ -14,6 +15,7 @@ public class ParserData {
     Boolean allowAnySubBook = false;
     Map<String, String> replacements = new HashMap<String,String>();
 
+    /* initialize parser name, optional parameters from params Map and regex */
     void init(String name, List<String> booksList, Map<String, Object> params){
         parserName = name;
 
@@ -70,6 +72,7 @@ public class ParserData {
         refRegex = RefRegex.refRegexInit(booksRegex, bannedWords, pref1, loc1, pref2, loc2);
     }
 
+    /* For parsers with sub books */
     ParserData(String name, List<String> booksList, List<List<String>> subBooksLists, Map<String, Object> params){
         List<String> subBookPref = null;
         if (params.containsKey("subBookPref")) {

@@ -8,17 +8,17 @@ import java.util.List;
  * Created by eurocom on 09/06/2017.
  * class to wrap reference regex creation.
  * Supply:
- * booksInit - to make regex out of list of strings (books)
- * refRegexInit - to create reference identifying regex.
+ * booksInit - Create regex out of list of strings (books).
+ * refRegexInit - Create reference identifying regex.
+ * mergeSubList - Merge list of major strings with list of lists of minor strings.
  */
 public class RefRegex {
 
     static List<String> delim = Arrays.asList("(( )?),(( )?)", " ", "(( )?)(\\|)(( )?)");
-    //static List<String> suffix = Arrays.asList("$", ";", ",", ".", "\\.", " ", "\\)","(\\|)",":","\\n");
     static List<String> suffix = Arrays.asList("[^א-ת\\-\"=]","$");
     static List<String> prefix = Arrays.asList("[^א-ת]");
 
-    /* create range regex of location */
+    /* Create range regex of location */
     static String locationRange(String location){
         return "(" + "(( )?)(-|(\\|))(( )?)" + location + ")";
     }
@@ -26,16 +26,13 @@ public class RefRegex {
         return "(" + "(( ))(-)(( ))" + location + ")";
     }
 
-    /* create regex from list of strings
-     * the strings are delimited by delim
+    /* Create regex from list of strings
+     * The strings are delimited by delim
      * pref and suf will be added as prefix and suffix to each string
      * globPref and globSuf will be added to the whole regex
-     * ToDo - consider less flexible, delim=|, no suf and pref, globPref and glob Suf will be added manually.
      */
     static String regexFromList(List<String> listString, String delim, String pref, String suf, String globPref, String globSuf){
         if (listString==null) return "";
-        //if (!globPref.equals("")) globPref = "(" + globPref + ")";
-        //if (!globSuf.equals("")) globSuf = "(" + globSuf + ")";
         String regex = "(" + globPref + "(";
         regex += "(" + pref + listString.get(0) + suf + ")";
         for( String string : listString.subList( 1, listString.size() ) ){
@@ -45,6 +42,7 @@ public class RefRegex {
         return regex;
     }
 
+    /* regexFromList wrappers */
     static String bandList(List<String> list){
         return regexFromList(list, "|", "", "","?!", "");
     }
@@ -58,6 +56,11 @@ public class RefRegex {
         return regexFromList(list, "|", "", "","", "");
     }
 
+    /* Merge major and minor into one list of regex.
+     * A regex is created for each string in major and corresponding list in minors as follow:
+     *      major orList(delimiters) optionalList(pref) orList(minors)
+     * Number of lists in minor is expected to be the same as number of strings in major.
+     */
     static List<String> mergeSubList (List<String> majors, List<List<String>> minorsArray, List<String> pref){
         List<String> mergedList = new ArrayList<String>();
         int majorIndex = 0;
@@ -73,26 +76,23 @@ public class RefRegex {
         return orList(booksList);
     }
 
-    /*
-     * create reference identifying regex out of:
-     *      books regex,
-     *      band words (after the book),
-     *      possible strings pre location 1,
-     *      location 1,
-     *      possible strings pre location 2,
-     *      location 2
+    /* create regex:
+     *      books regex, band words, location (-(location|location 2))?
+     *
+     *      location stands for:
+     *          possible strings pre location 1,
+     *          location 1,
+     *          possible strings pre location 2,
+     *          location 2
      */
-
     static String refRegexInit(String books, List<String> booksBand, List<String> pref1, String loc1, List<String> pref2, String loc2){
         String buildRefRegex = "(?<="+prefix+")" + books + "[\\']?" + orList(delim);
         buildRefRegex += bandList(booksBand);
 
         String location = optionalList(pref1) + loc1 + orList(delim) + optionalList(pref2) + loc2;
-        //loc += locationRange(loc2);
 
         buildRefRegex += location;
         buildRefRegex += optionalNoSpaceList(Arrays.asList(locationLargeRange(location),locationRange(loc2)));
-        //buildRefRegex += locationRange(loc);
 
         buildRefRegex += orList(suffix);
         dbg(INFO.id,buildRefRegex);

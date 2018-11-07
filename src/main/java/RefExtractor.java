@@ -8,41 +8,46 @@ import static utils.StringUtils.*;
 
 /**
  * Created by eurocom on 18/06/2017.
- * Abstract class, give functionality to find and format references in jsoup document.
- * class relay on regex provided by it's inheritance classes
- * references will be saved in 'sourceList'
+ * Abstract class, implement all common operations to find and format extractor references in a text.
+ * Relay on regex and other data provided by it's inheriting classes.
+ * Calling parent (Extractor) function extract will return list of formatted references found in the provided text.
  */
 abstract public class RefExtractor extends Extractor {
-    /* strings to filter etc. global to all parsers*/
+    /* default reference location structure regex */
+    static String location;
+    static {
+        String locUnity = "[א-ט]";
+        String locTens = "[ט-צ&&[^ץ,^ף,^ן,^ך,^ם]]";
+        String locHundreds = "[ק-ת]";
+        String locAll = "[א-ת&&[^ץ,^ף,^ן,^ך,^ם]]";
+        location = RefRegex.regexFromList(Arrays.asList(locHundreds,locTens,locUnity),
+                "", "(", "[\\\"]?)?","(?=" + locAll + ")", "[\\']?");
+    }
 
-    static String locUnity = "[א-ט]";
-    static String locTens = "[ט-צ&&[^ץ,^ף,^ן,^ך,^ם]]";
-    static String locHundreds = "[ק-ת]";
-    static String locAll = "[א-ת&&[^ץ,^ף,^ן,^ך,^ם]]";
-    static String location = RefRegex.regexFromList(Arrays.asList(locHundreds,locTens,locUnity),
-            "", "(", "[\\\"]?)?","(?=" + locAll + ")", "[\\']?");
-
-
-    //static String location = "([א-ת&&[^ץ,^ף,^ן,^ך,^ם]][\\\"]?){1,3}[\\']?";
-    //static String location = "([א-ת]){1,3}";
+    /* extra characters need to ignore and/or clean */
     static List<String> badWords = Arrays.asList("\\\'", "\\\"", "\\.", ";", "\\)", "\\(");
     static List<String> ignoredPrefSuf = Arrays.asList("\\{", "\\}", "\\[", "\\]");
     static List<String> ignoredMiddle = Arrays.asList("\\\'", "\\\"");
 
+    /* current found reference */
     String rawRef;
     List<String> cleanRefs=new LinkedList<String>();
 
-    /*list to hold all found references by the parser*/
+    /* list to hold all found references by the parser */
     List<Reference> parserRefs=new LinkedList<Reference>();
 
-    /* Getters functions to relay on static inheritance class regex */
+    /* Getters functions to get unique static data of inheriting class */
     abstract protected ParserData getParserData();
 
     protected String getRegularExpression(){
         return getParserData().refRegex;
     }
 
-    void prepareURI(){
+    /* Depend on inheriting class.
+        - Allow any sub book (assuming this is not adding uniqueness but for some reason exist in the DB).
+        - Replace given names in references.
+    */
+    void URIUniqueRequirements(){
         for (int i = 0; i < cleanRefs.size(); i++)
         {
             String ref = cleanRefs.get(i);
@@ -60,6 +65,7 @@ abstract public class RefExtractor extends Extractor {
         }
     }
 
+    /* in case range is in reverse order, the order is turned over */
     void switchRange(){
         for (int i = 0; i < cleanRefs.size(); i++)
         {
@@ -91,67 +97,70 @@ abstract public class RefExtractor extends Extractor {
         }
     }
 
-    /* format the reference by cleaning/adding extra white spaces and comma */
+    /* Format the reference by cleaning/adding and replacing characters.
+     * Different available formats will require different changes */
     void formatReference() {
         String suff="";
 
-        //clean suffix
+        /* clean extra suffix */
         rawRef = rawRef.replaceAll("(?i)[\\s]+$", "");
         rawRef = rawRef.replaceAll(RefRegex.suffix + "$", "");
 
-        // only one '|'
+        /* in case only one '|', save the data pass the '|' for later use */
         if(rawRef.split("\\|").length==2){
             suff = rawRef.split("\\|")[1];
         }
 
-        //clean extra spaces surrounding delimiters, replace '|' with ','
+        /* clean extra spaces surrounding delimiters, replace '|' with ',' */
         rawRef = rawRef.replaceAll("([\\s]+)", " ");
         rawRef = rawRef.replaceAll("([\\s]*)(\\|)([\\s]*)", ",");
         rawRef = rawRef.replaceAll("([\\s]*)-([\\s]*)", "-");
         rawRef = rawRef.replaceAll("([\\s]*),([\\s]*)", ",");
 
-        //replace space delimiter with ','
+        /* replace space delimiter with ',' */
         String[] bookSplit = rawRef.split("(?<=" + getParserData().booksRegex + ")");
-        bookSplit[1] = bookSplit[1].replaceAll("[\\s]+", ",");
-        bookSplit[1] = bookSplit[1].replaceAll("(?i),,", ",");
+        String books = bookSplit[0];
+        String location = bookSplit[1];
+        location = location.replaceAll("[\\s]+", ",");
+        location = location.replaceAll("(?i),,", ",");
 
-        //large range format: שמות ג,כב - ד,יב
-        if (bookSplit[1].split("-").length>1 && bookSplit[1].split("-")[1].split(",").length>1) {
-            dbg(FOUND.id,"large range format: " + bookSplit[0] + bookSplit[1]);
-            String from = bookSplit[1].split("-")[0].split("^,")[1];
-            String to = bookSplit[1].split("-")[1];
+        /* large range format: shmot g,cb - d,yb
+         * check '-' exist and second part contain delimiter */
+        if (location.contains("-") && location.split("-")[1].contains(",")) {
+            dbg(FOUND.id,"large range format: " + books + location);
+            String from = location.split("-")[0].split("^,")[1];
+            String to = location.split("-")[1];
             dbg(FOUND.id,"large range format: from:" + from + "to:" + to);
+            /* Checking the 'to' 'perek' is valid. Sanity test to reduce mistakenly detected as large range. */
             if (!Arrays.asList(UriConverter.psukimSet).contains(to.split(",")[0])){
-                //mistakenly detected
-                bookSplit[1] = "," + from;
-                dbg(FOUND.id,"large range format: mistakenly detected, changing to: " + bookSplit[1]);
+                location = "," + from;
+                dbg(FOUND.id,"large range format: mistakenly detected, changing to: " + location);
+            /* Checking the 'to' 'pasuk' is valid. Sanity test to reduce mistakenly detected regular range as large range. */
             } else if (!Arrays.asList(UriConverter.psukimSet).contains(to.split(",")[1])){
-                //mistakenly detected, regular range
-                bookSplit[1] = "," + from  + "-" + to.split(",")[0];;
-                dbg(FOUND.id,"large range format: mistakenly detected, changing to regular range: " + bookSplit[1]);
+                location = "," + from  + "-" + to.split(",")[0];;
+                dbg(FOUND.id,"large range format: mistakenly detected, changing to regular range: " + location);
+            /* Large range on same chapter */
             } else if (from.split(",")[0].equals(to.split(",")[0]) ){
-                //same chapter
-                bookSplit[1] = "," + from + "-" + to.split(",")[1];
-                dbg(FOUND.id,"large range format: same chapter: " + bookSplit[1]);
+                location = "," + from + "-" + to.split(",")[1];
+                dbg(FOUND.id,"large range format: same chapter: " + location);
+            /* Large range on 2 chapters, creating 2 references */
             } else {
-                String ref1 = bookSplit[0] + "," + from + "- ";
+                String ref1 = books + "," + from + "- ";
                 cleanRefs.add(ref1.replaceAll(",", ", "));
                 dbg(FOUND.id,"large range format: different chapters: " + ref1.replaceAll(",", ", "));
-                bookSplit[1] = "," + to.split(",")[0] + ",א-" + to.split(",")[1];
-                dbg(FOUND.id,"                                       : " + bookSplit[1]);
+                location = "," + to.split(",")[0] + ",א-" + to.split(",")[1];
+                dbg(FOUND.id,"                                       : " + location);
             }
         }
 
-        rawRef = bookSplit[0] + bookSplit[1];
+        rawRef = books + location;
         rawRef = rawRef.replaceAll(",", ", ");
 
 
         // 4 delimiters - last section is a mistake or range.
         if (rawRef.split(",").length > 3){
+            /* '|' was the las delimiter out of 4 and the only '|' == mistake. example: shmot g cb| perek g */
             if(rawRef.split(",")[3].replaceAll(" ", "").equals(suff.replaceAll(" ", "")) ) {
-                /* '|' was the las delimiter out of 4 and the only '|'
-                    example שמות, ג, כב| פרק ג
-                 */
                String[] refSplitB = rawRef.split(",");
                 rawRef = refSplitB[0] + "," + refSplitB[1] + "," + refSplitB[2];
             } else {
@@ -168,7 +177,7 @@ abstract public class RefExtractor extends Extractor {
         dbg(FOUND.id,"רפרנסים מה" + getParserData().parserName + ":");
     }
 
-    /* For each found reference in the matcher will clean badWords, format and add to sourceList. */
+    /* For each found reference in the matcher will clean badWords and format. */
     public List<String> normalize(Matcher m){
         rawRef = m.group(0);
         dbg(FOUND.id, rawRef +" (raw)" );
@@ -176,7 +185,7 @@ abstract public class RefExtractor extends Extractor {
         cleanRefs.clear();
         formatReference();
         switchRange();
-        prepareURI();
+        URIUniqueRequirements();
         return cleanRefs;
     }
 
@@ -186,7 +195,6 @@ abstract public class RefExtractor extends Extractor {
         text = cleanStringsSpace(text , ignoredPrefSuf);
         text = cleanWords(text , getParserData().toFilter );
         text = cleanExtraSpaces(text);
-        //System.out.println(text);
         return text;
     }
 }
