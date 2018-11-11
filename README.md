@@ -72,6 +72,7 @@ Click on Download options -> GZIP -> show all -> hewiki-20160203-pages-articles.
 Then, extract the file and put it in the root folder of the project - jbs-classifier.
 
 There are 2 running modes: working with all wkikpedia pages or aorking with specific pages given in as input in a file.
+In input file mode, you need to supply a file with the names of your desired articles' titles, each one in a seperate line.
 
 Running:
 java -cp target/jbs-classifier-1.0-SNAPSHOT-jar-with-dependencies.jar MainClass
