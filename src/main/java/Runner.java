@@ -57,9 +57,8 @@ public class Runner implements Runnable {
     public Runner(WikiArticle page) throws Exception {
         this.pageId = page.getId();
         try {
-            profiler.restartTimer();
             newWiki = new WikiPageParser(page);
-            profiler.sumRestartTimer(profiler.nFetchWiki, profiler.fetchWikiTotalTime);
+            profiler.sumRestartTimer(profiler.nFetchWiki, profiler.fetchWiki);
         } catch (Exception e) {
             return;
         }
@@ -77,24 +76,24 @@ public class Runner implements Runnable {
         try {
             /* Parsing wiki page */
             newWiki.parsePage();
-            profiler.sumRestartTimer(profiler.nProcWikiPages, profiler.procWikiTotalTime);
             writeToFile(allPages, newWiki.pageTitle);
 
             /* Converting found reference to URIs and adding to JsonTuple */
             jt = new JsonTuple("http://he.wikipedia.org/?curid=" + pageId, newWiki.pageTitle);
             handelSourceLists();
-            profiler.sumRestartTimer(profiler.numConverts, profiler.convUriTotalTime);
 
             /* Writing updated profiler information to file */
             writeProfiler();
 
-	        if(jt.mentions.isEmpty())
-	            return;
+	        if(jt.mentions.isEmpty()){
+                profiler.sumRestartTimer(profiler.numFileWrite, profiler.writeToFile);
+                return;
+            }
 
             /* write JsonTuple to json file */
             dbg(FINAL.id | PAGE.id, "מוסיף נושא:  " + newWiki.pageTitle + "\n");
             writeJsonTuple(jt);
-            profiler.sumRestartTimer(profiler.numFileWrite, profiler.writeToFileTime);
+            profiler.sumRestartTimer(profiler.numFileWrite, profiler.writeToFile);
 
         } catch (Exception e) {
 	        System.out.println(newWiki.pageTitle);
@@ -117,7 +116,6 @@ public class Runner implements Runnable {
         writeToFile(pageRefs,newWiki.pageTitle + ":");
 
         /* Iterate parsers, all parser's refs are converted to URIs and added to the JsonTuple */
-        profiler.restartTimer();
         UriConverter.nErrors=0;
         for (RefExtractor parser : newWiki.parsers)
             sourceList2URIs(parser.parserRefs);
@@ -128,8 +126,10 @@ public class Runner implements Runnable {
         for(Reference reference : referenceList){
             dbg(FINAL.id, reference.fullRef);
             writeToFile(pageRefs,reference.fullRef);
+            profiler.sumRestartTimer(null, profiler.writeToFile);
             try {
                 ArrayList<String> uris = new UriConverter(reference.fullRef).getUris();
+                profiler.sumRestartTimer(profiler.numConverts, profiler.convUri);
 
                 /* First URI for wiki page */
                 if(!uris.isEmpty() && uriExist==0){
@@ -154,41 +154,37 @@ public class Runner implements Runnable {
     /* Write updated profile information to the stat file */
     void writeProfiler() throws Exception {
         long sumTimers = profiler.otherTotalTime;
-        sumTimers += profiler.procWikiTotalTime.longValue();
-        sumTimers += profiler.fetchWikiTotalTime.longValue();
-        sumTimers += profiler.convUriTotalTime.longValue();
-        sumTimers += profiler.procWikiTitleTime.longValue();
-        sumTimers += profiler.fetchWikiParagraphsTime.longValue();
-        sumTimers += profiler.fetchWikiRefTime.longValue();
-        sumTimers += profiler.procWikiRefTime.longValue();
-        sumTimers += profiler.writeToFileTime.longValue();
+        sumTimers += profiler.fetchWiki.longValue();
+        sumTimers += profiler.convUri.longValue();
+        sumTimers += profiler.fetchWikiTitle.longValue();
+        sumTimers += profiler.paragraphsSplit.longValue();
+        sumTimers += profiler.fetchParagraphRef.longValue();
+        sumTimers += profiler.procParagraphRef.longValue();
+        sumTimers += profiler.writeToFile.longValue();
 
         long totTime = new Date().getTime() - profiler.startRunTime;
         writeToFile(resDir + "profiler",
-                // constructor should be nothing
-                "fetch wiki time: " + profiler.fetchWikiTotalTime.longValue() +
-                "\nfetched wikis: " + profiler.nFetchWiki.intValue() +
+                "Run time in milli seconds:" +
+                "\n\nFetch wiki time: " + profiler.fetchWiki.longValue() +
+                "\nFetched wikis: " + profiler.nFetchWiki.intValue() +
 
-                "\n\nprocess time: " + profiler.procWikiTotalTime.longValue() +
-                "\nprocessed pages: " + profiler.nProcWikiPages.intValue() +
+                "\n\nFetch title time: " + profiler.fetchWikiTitle.longValue() +
+                "\nTitles fetched: " + profiler.nFetchWikiTitles.intValue() +
 
-                "\n\nfetch title: " + profiler.procWikiTitleTime.longValue() +
-                "\ntitles fetched: " + profiler.nProcWikiTiltles.intValue() +
+                "\n\nSplit paragraphs time: " + profiler.paragraphsSplit.longValue() +
+                "\nParagraph splits: " + profiler.nParagraphsSplit.intValue() +
 
-                "\n\nfetch paragraphs time: " + profiler.fetchWikiParagraphsTime.longValue() +
-                "\nparagraph fetches: " + profiler.nFetchWikiParagraphs.intValue() +
+                "\n\nFetch refs time: " + profiler.fetchParagraphRef.longValue() +
+                "\nParagraph fetches (one per parsers): " + profiler.nFetchParagraphRefs.intValue() +
 
-                "\n\nfetch Refs time: " + profiler.fetchWikiRefTime.longValue() +
-                "\nrefs fetches: " + profiler.nFetchWikiRefs.intValue() +
+                "\n\nProcess refs time: " + profiler.procParagraphRef.longValue() +
+                "\nParagraph refs processed: " + profiler.nProcParagraphRefs.intValue() +
 
-                "\n\nprocess refs time: " + profiler.procWikiRefTime.longValue() +
-                "\nrefs processes: " + profiler.nProcWikiRefs.intValue() +
+                "\n\nConvert time: " + profiler.convUri.longValue() +
+                "\nConverted pages: " + profiler.numConverts.intValue() +
 
-                "\n\nconvert time: " + profiler.convUriTotalTime.longValue() +
-                "\nconverted pages: " + profiler.numConverts.intValue() +
-
-                "\n\nwrite to file time: " + profiler.writeToFileTime.longValue() +
-                "\nwritings to file: " + profiler.numFileWrite.intValue() +
+                "\n\nWrite to file time: " + profiler.writeToFile.longValue() +
+                "\nWritings to file (per file): " + profiler.numFileWrite.intValue() +
 
                 "\n\nrest of the time: " + profiler.otherTotalTime +
                 "\n\ntimers sum: " + sumTimers + "\ntotal time: " + totTime,

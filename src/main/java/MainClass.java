@@ -44,12 +44,13 @@ public class MainClass {
 
 		System.out.println("-a, --all                       Start Wikipedia full scan (scan all pages).\n");
 		System.out.println("-f, --file <file>               Scan specific Wikipedia pages.\n" +
-						   "                                Pages topic should be provided in the added file\n" +
-						   "                                Using \'topics.in\' as default file\n");
+						   "                                Pages titles should be provided in the added file,\n" +
+						   "                                separated by linebreak.\n" +
+						   "                                Using \'topics.in\' as default file.\n");
 		System.out.println("-t, --test <file>               Scan a file emulating a Wikipedia page.\n" +
-						   "                                Using \'test.in\' as default file\n");
+						   "                                Using \'test.in\' as default file.\n");
 		System.out.println("-T, --time <timestamp>          Provide timestamp used for the output folder.\n" );
-		System.out.println("-h, --help                      Print this message");
+		System.out.println("-h, --help                      Print this message.");
 		System.out.println("-d, --dbg <debug flags>         Specify which debug flags to enable.");
 		System.out.println("                                PAGE and ERROR are enabled by default.");
 		System.out.println("                                Following debug flags are available:");
@@ -63,16 +64,16 @@ public class MainClass {
 		System.out.println("                                URI   - References URI found in parsed wiki page.");
 		System.out.println("                                ANY   - Enable all debug messages.\n");
 
-		System.out.println("Scan output is written to outputs/<timestamp>.json\n");
+		System.out.println("Scan output is written to results/<timestamp>/result.json\n");
 
-		System.out.println("Further information is available under 'stat_<timestamp>' \nin the following files:");
-		System.out.println("all_pages                       All parsed pages");
-		System.out.println("pages_with_refs                 Pages with potential references");
-		System.out.println("pages_refs                      Potential references by page");
-		System.out.println("pages_with_uri                  Pages with references");
-		System.out.println("pages_uri                       URIs by page");
-		System.out.println("error_pages                     Un-parsable pages");
-		System.out.println("profiler                      	Run time information of each phase\n\n");
+		System.out.println("Further information is available under the same location in the following files:");
+		System.out.println("all_pages                       All parsed wiki pages titles.");
+		System.out.println("pages_with_refs                 Titles of wiki pages with potential references found by the pattern matcher.");
+		System.out.println("pages_refs                      Potential references found in a wiki page by the pattern matcher,\n" +
+				           "                                with corresponding wiki page title.");
+		System.out.println("pages_with_uri                  Titles of wiki pages with found URIs.");
+		System.out.println("pages_uri                       URIs found in a wiki page with corresponding wiki page title.");
+		System.out.println("profiler                      	Run time information of the different phases.\n\n");
 	}
 
 	static boolean readArguments(String[] args) throws Exception {

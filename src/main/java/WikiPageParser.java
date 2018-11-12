@@ -44,17 +44,17 @@ public class WikiPageParser {
     void findReferences(){
 
         String[] paragraphs = wikiPage.getText().split("[\n]");
-        Runner.profiler.sumRestartTimer(Runner.profiler.nFetchWikiParagraphs, Runner.profiler.fetchWikiParagraphsTime);
+        Runner.profiler.sumRestartTimer(Runner.profiler.nParagraphsSplit, Runner.profiler.paragraphsSplit);
 
         /* Iterate paragraphs, for each paragraphs run all parsers and add the found references to parser references list */
         for (String paragraph : paragraphs) {
             dbg(INFO.id, paragraph);
             for (RefExtractor parser : parsers) {
                 List<String> refs = parser.extract(paragraph);
-                Runner.profiler.sumRestartTimer(Runner.profiler.nFetchWikiRefs, Runner.profiler.fetchWikiRefTime);
+                Runner.profiler.sumRestartTimer(Runner.profiler.nFetchParagraphRefs, Runner.profiler.fetchParagraphRef);
                 for (String ref : refs)
                     parser.parserRefs.add(new Reference(ref, paragraph));
-                Runner.profiler.sumRestartTimer(Runner.profiler.nProcWikiRefs, Runner.profiler.procWikiRefTime);
+                Runner.profiler.sumRestartTimer(Runner.profiler.nProcParagraphRefs, Runner.profiler.procParagraphRef);
             }
         }
     }
@@ -63,7 +63,7 @@ public class WikiPageParser {
     public void parsePage() {
         setPageTitle();
         findCategories();
-        Runner.profiler.sumRestartTimer(Runner.profiler.nProcWikiTiltles, Runner.profiler.procWikiTitleTime);
+        Runner.profiler.sumRestartTimer(Runner.profiler.nFetchWikiTitles, Runner.profiler.fetchWikiTitle);
         findReferences();
     }
 }

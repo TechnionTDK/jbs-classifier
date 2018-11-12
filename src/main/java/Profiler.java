@@ -15,28 +15,26 @@ public class Profiler {
     long startTime = new Date().getTime();
     long startRunTime = new Date().getTime();
 
-    MutableLong fetchWikiTotalTime = new MutableLong(0);
+
+    MutableLong fetchWiki = new MutableLong(0);
     MutableInt nFetchWiki = new MutableInt(0);
 
-    MutableLong procWikiTitleTime = new MutableLong(0);
-    MutableInt nProcWikiTiltles = new MutableInt(0);
+    MutableLong fetchWikiTitle = new MutableLong(0);
+    MutableInt nFetchWikiTitles = new MutableInt(0);
 
-    MutableLong procWikiTotalTime = new MutableLong(0);
-    MutableInt nProcWikiPages = new MutableInt(0);
+    MutableLong paragraphsSplit = new MutableLong(0);
+    MutableInt nParagraphsSplit = new MutableInt(0);
 
-    MutableLong fetchWikiParagraphsTime = new MutableLong(0);
-    MutableInt nFetchWikiParagraphs = new MutableInt(0);
+    MutableLong fetchParagraphRef = new MutableLong(0);
+    MutableInt nFetchParagraphRefs = new MutableInt(0);
 
-    MutableLong fetchWikiRefTime = new MutableLong(0);
-    MutableInt nFetchWikiRefs = new MutableInt(0);
+    MutableLong procParagraphRef = new MutableLong(0);
+    MutableInt nProcParagraphRefs = new MutableInt(0);
 
-    MutableLong procWikiRefTime = new MutableLong(0);
-    MutableInt nProcWikiRefs = new MutableInt(0);
-
-    MutableLong convUriTotalTime = new MutableLong(0);
+    MutableLong convUri = new MutableLong(0);
     MutableInt numConverts = new MutableInt(0);
 
-    MutableLong writeToFileTime = new MutableLong(0);
+    MutableLong writeToFile = new MutableLong(0);
     MutableInt numFileWrite = new MutableInt(0);
 
     long otherTotalTime = 0;
@@ -50,7 +48,7 @@ public class Profiler {
     void sumRestartTimer(MutableInt nElements, MutableLong timer){
         timer.add(new Date().getTime() - startTime);
         startTime = new Date().getTime();
-        nElements.increment();
+        if (nElements!=null) nElements.increment();
     }
 
 }
