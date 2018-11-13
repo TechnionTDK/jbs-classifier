@@ -1,0 +1,27 @@
+Run time in milli seconds:
+
+Fetch wiki time: 45057
+Fetched wikis: 524867
+
+Fetch title time: 19369
+Titles fetched: 524865
+
+Split paragraphs time: 15019
+Paragraph splits: 524865
+
+Fetch refs time: 4647120
+Paragraph fetches (one per parsers): 56751455
+
+Process refs time: 23947
+Paragraph refs processed: 56751454
+
+Convert time: 36103890
+Converted pages: 28212
+
+Write to file time: 2886858
+Writings to file (per file): 524863
+
+rest of the time: 0
+
+timers sum: 43741260
+total time: 43787878
