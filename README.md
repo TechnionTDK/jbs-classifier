@@ -79,24 +79,23 @@ java -cp target/jbs-classifier-1.0-SNAPSHOT-jar-with-dependencies.jar MainClass
  [--all|--file <path to file>|--help] [--dbg <debug flags>]
 
 
-Scan output is written to outputs/timestamp.json
+The results and other statistics are written to results/timestam directory. 
 
-Further information is available under 'stat_timestamp'
-in the following files:
+The information is organized in the following files:
 
-all_pages - All parsed pages
+results.json - the output 
 
-pages_with_refs - Pages with potential references
+all_pages - All parsed pages' titles. 
 
-pages_refs - Potential references by page
+pages_with_refs - The titles of pages with potential references found.
 
-pages_with_uri - Pages with references
+pages_refs - Potential references, in the form of page title + the page references.
 
-pages_uri - URIs by page
+pages_with_uri - Pages with references after validation (converting to uri)
 
-error_pages - Un-parsable pages
+pages_uri - URIs found, in the same form as pages refs.
 
-profiler - Run time information of each phase
+profiler - Run time information of each phase (in ms)
 
 ## Expanding the project to recognize more sources
 
